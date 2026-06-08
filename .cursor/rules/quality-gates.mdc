@@ -1,0 +1,47 @@
+---
+description: Continuous enforcement of local Quality Gates and the Meta-Prompt Evaluation cycle.
+globs: *
+alwaysApply: true
+---
+
+# Quality Gates & Session Closure
+
+Full workflow: [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §9
+
+## Before marking any task, batch, or file "complete"
+
+Explicitly self-verify or prompt the author to confirm all **3 Local Quality Gates**:
+
+| Gate | Check | Command / action |
+| --- | --- | --- |
+| 🟢 **1.1 Lint** | ESLint clean on changed files | `npm run lint` |
+| 🟢 **1.2 Typecheck** | Strict TypeScript passes | `npm run typecheck` |
+| 🟢 **1.3 Local Smoke** | `@smoke` suite in Docker (pre-push parity) | `npm run docker:test:smoke` |
+
+Additional pre-commit requirements (Husky):
+
+- Gate 1.1 **Cursor AI audit** against `docs/SELECTOR_POLICY.md` + no assertions in POMs (before `git commit`)
+
+> 🛑 **Husky blocks:** Pre-commit rejects AI artifacts and unverified placeholders — including `// TODO: AI Generated`, `page.pause()`, and unverified stubs.
+> ℹ️ **Emergency bypass:** `git push --no-verify` is reserved for exceptional cases only. Justification **must** be stated in the PR Escape Hatch section.
+
+## Remote Gate 2
+
+After push: GitHub Actions in Playwright Docker must pass before merge. Local Gate 1.3 does not replace CI.
+
+## Meta-Prompt Evaluation (end of each batch PR)
+
+Before opening a PR, run the evaluation prompt from `CONTRIBUTING.md` §9 and append results to [`docs/AI_VELOCITY_LOG.md`](../../docs/AI_VELOCITY_LOG.md).
+
+**KPI targets:**
+
+- Prompt-to-Code Ratio: **< 3 prompts per feature**
+- Refactor Rate: **zero full-file rewrites** from poor context
+- Context Efficiency: every prompt uses explicit `@file` references (`@CONTRIBUTING.md`, `@SELECTOR_POLICY.md`, source files)
+
+## 🚫 Agent Constraints & Guardrails
+
+- **Never** auto-commit or auto-push
+- **Never** create files outside `docs/BLUEPRINT.md` structure
+- **One batch per PR** — follow `docs/ROADMAP.md` sequentially
+- Read `CONTRIBUTING.md` + `docs/SELECTOR_POLICY.md` before generating test or POM code

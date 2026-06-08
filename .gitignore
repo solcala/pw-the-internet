@@ -13,4 +13,6 @@ node_modules/
 *.png
 
 # IDE
-.cursor/
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
