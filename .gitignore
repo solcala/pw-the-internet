@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# MCP / exploration artifacts
+.playwright-mcp/
+*.png
+
+# IDE
+.cursor/
