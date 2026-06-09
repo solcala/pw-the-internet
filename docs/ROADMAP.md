@@ -1,8 +1,49 @@
 # Implementation Roadmap
 
-> **Status:** Approved architecture — implement and commit one batch at a time.
+> **Status:** Batch 1 merged (`PR #1` — `feat/setup-infra`). **Next step: Batch 2 — Framework Core.**
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
+
+---
+
+## Implementation progress
+
+**Last updated:** 2026-06-09 · **Branch:** `main` · **Latest merge:** `c860c57` (PR #1)
+
+```text
+Batch 1 ████████████████████░  ~95%  merged — minor gaps remain
+Batch 2 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
+Batch 3 ░░░░░░░░░░░░░░░░░░░░   0%
+Batch 4 ██████░░░░░░░░░░░░░░  ~30%  container CI only (ad-hoc fix)
+Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
+```
+
+| Batch | Status | PR / notes |
+| --- | --- | --- |
+| 1 | **~95% done — merged** | PR #1 `feat/setup-infra` — tooling, Husky, Docker scaffold, `.cursor/rules/` |
+| 2 | **Not started** | **Next PR** — POM, fixtures injection, data migration |
+| 3 | **Not started** | Blocked on Batch 2 — flat specs + `@smoke` / `@regression` tags |
+| 4 | **Partial (~30%)** | `playwright.yml` uses Playwright Docker image (fixes Noble install error); full dual-gate pipeline pending |
+| 5–7 | **Not started** | — |
+
+### Batch 1 — remaining gaps (close before or during Batch 2)
+
+- [x] Add `AGENTS.md` summarizing AI agent boundaries
+- [ ] Update `README.md` — remove "migrating" / "initial draft" language; document dual-gate dev setup
+- [ ] Verify exit criteria end-to-end: `npm run lint && npm run typecheck && npm test`
+
+### Batch 4 — early work (not a substitute for full Batch 4 PR)
+
+Done ad-hoc while fixing GitHub Actions:
+
+- [x] `.github/workflows/playwright.yml` runs inside `mcr.microsoft.com/playwright:v1.59.1-noble`
+- [x] Removed deprecated `microsoft/playwright-github-action@v1`
+
+Still required in a dedicated Batch 4 PR (after Batch 3):
+
+- [ ] Rename workflow → `ci.yml` with `lint → typecheck → test:smoke (PR) → test:ci (main)`
+- [ ] Use `docker compose run --rm test-smoke` instead of bare `npx playwright test`
+- [ ] Branch protection + failure artifacts (JUnit, traces)
 
 ---
 
@@ -29,15 +70,15 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
  Infra+AI    Framework    Migrate      CI/CD       Coverage    Visibility   Culture
 ```
 
-| Batch | Name | Goal | Est. effort |
-| --- | --- | --- | --- |
-| 1 | Infrastructure, hooks & AI standards | TS tooling, Husky, `.cursor/rules/` from day one | 1 PR |
-| 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR |
-| 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR |
-| 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR |
-| 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs |
-| 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR |
-| 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR |
+| Batch | Name | Goal | Est. effort | Progress |
+| --- | --- | --- | --- | --- |
+| 1 | Infrastructure, hooks & AI standards | TS tooling, Husky, `.cursor/rules/` from day one | 1 PR | ~95% merged |
+| 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR | **Next** |
+| 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | Not started |
+| 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | ~30% |
+| 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | Not started |
+| 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | Not started |
+| 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | Not started |
 
 ---
 
@@ -45,38 +86,40 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 **Objective:** Establish the local quality foundation and AI governance **before** any framework or test migration work.
 
+**Batch status:** ~95% complete — merged via PR #1 (`feat/setup-infra`). Minor gaps listed in [Implementation progress](#implementation-progress).
+
 ### Batch 1 — Checklist
 
 #### Tooling & environment
 
-- [ ] Add `tsconfig.json` with strict mode and path aliases (`@pages`, `@fixtures`, `@data`, `@config`)
-- [ ] Add ESLint (`@typescript-eslint` + Playwright plugin)
-- [ ] Add Prettier with shared config
-- [ ] Create `src/` directory scaffold
-- [ ] Create `.env.example` documenting `BASE_URL`, `CI`, auth credentials
-- [ ] Split environment config into `src/config/environments.ts`
-- [ ] Refactor `playwright.config.ts` to import from `src/config/` (flat `testDir: './tests'` — no tier folders)
-- [ ] Add npm scripts: `lint`, `format`, `typecheck`, `test:smoke`, `test:regression`, `test:ci`
+- [x] Add `tsconfig.json` with strict mode and path aliases (`@pages`, `@fixtures`, `@data`, `@config`)
+- [x] Add ESLint (`@typescript-eslint` + Playwright plugin)
+- [x] Add Prettier with shared config
+- [x] Create `src/` directory scaffold
+- [x] Create `.env.example` documenting `BASE_URL`, `CI`, auth credentials
+- [x] Split environment config into `src/config/environments.ts`
+- [x] Refactor `playwright.config.ts` to import from `src/config/` (flat `testDir: './tests'` — no tier folders)
+- [x] Add npm scripts: `lint`, `format`, `typecheck`, `test:smoke`, `test:regression`, `test:ci`
 
 #### Gate 1 — Layer 1: Husky + lint-staged (local git hooks)
 
-- [ ] Add Husky with `pre-commit` hook
-- [ ] Configure lint-staged: ESLint + Prettier on staged `.ts` files
-- [ ] Pre-commit runs `npm run typecheck` on staged changes
-- [ ] Gate 1.3: Add mandatory Husky `pre-push` hook running the containerized smoke suite (`docker compose -f docker/docker-compose.yml run --rm test:smoke`) with documented escape hatch
+- [x] Add Husky with `pre-commit` hook
+- [x] Configure lint-staged: ESLint + Prettier on staged `.ts` files
+- [x] Pre-commit runs `npm run typecheck` on staged changes
+- [x] Gate 1.3: Add mandatory Husky `pre-push` hook running the containerized smoke suite (`docker compose -f docker/docker-compose.yml run --rm test-smoke`) with documented escape hatch
 - [ ] Verify: commit is **blocked** when lint or typecheck fails
 
 #### Gate 1 — Layer 0: AI standards from day one
 
-- [ ] Create `.cursor/rules/` with project conventions (read `CONTRIBUTING.md` before codegen)
-- [ ] Add `AGENTS.md` summarizing AI agent boundaries (audit only, never auto-commit)
-- [ ] Document local AI review prompt in `.cursor/rules/` (audit against `SELECTOR_POLICY.md`)
-- [ ] Ensure `CONTRIBUTING.md` §8–9 dual-gate workflow is the canonical reference
-- [ ] Add `.github/PULL_REQUEST_TEMPLATE.md` with Gate 1 / Gate 2 checklists
+- [x] Create `.cursor/rules/` with project conventions (read `CONTRIBUTING.md` before codegen) — 5 rule files tracked
+- [x] Add `AGENTS.md` summarizing AI agent boundaries (audit only, never auto-commit)
+- [x] Document local AI review prompt in `.cursor/rules/` (audit against `SELECTOR_POLICY.md`)
+- [x] Ensure `CONTRIBUTING.md` §8–9 dual-gate workflow is the canonical reference
+- [x] Add `.github/PULL_REQUEST_TEMPLATE.md` with Gate 1 / Gate 2 checklists
 
 #### Documentation
 
-- [ ] Update `README.md` with dev setup, dual-gate workflow, and link to `CONTRIBUTING.md`
+- [ ] Update `README.md` with dev setup, dual-gate workflow, and link to `CONTRIBUTING.md` (partial — still references migration state)
 
 ### Batch 1 — Exit criteria
 
@@ -92,12 +135,14 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 **Objective:** Build the reusable framework layer — page objects, fixtures, and the centralized tag system.
 
+**Batch status:** **Not started — NEXT PR.** Scaffolding exists (`src/pages/the-internet/.gitkeep`, stub `src/fixtures/index.ts`) but no real POM or fixture injection yet. Legacy code still at `pages/` and `utils/`.
+
 ### Batch 2 — Checklist
 
 #### Page objects & fixtures
 
 - [ ] Create `src/pages/base.page.ts` (navigation, `goto`, `waitForLoaded`)
-- [ ] Create `src/fixtures/index.ts` — custom `test` export (specs never import `@playwright/test` directly)
+- [ ] Extend `src/fixtures/index.ts` — custom `test` export with page injection (currently stub re-export only)
 - [ ] Create `src/fixtures/pages.fixture.ts` — inject page objects into test context
 - [ ] Migrate `pages/add-remove-elements.page.ts` → `src/pages/the-internet/add-remove-elements.page.ts`
 - [ ] Create `src/pages/the-internet/landing.page.ts`
@@ -105,7 +150,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 #### Centralized tag system
 
-- [ ] Create `src/config/test-tags.ts`:
+- [x] Create `src/config/test-tags.ts` (completed early in Batch 1):
 
   ```typescript
   export const TAGS = {
@@ -117,11 +162,11 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
   ```
 
 - [ ] Export grep helpers or document tag usage pattern for specs and CI scripts
-- [ ] Wire `package.json` scripts to use tag constants (or consistent grep strings)
+- [x] Wire `package.json` scripts to use tag constants (or consistent grep strings)
 
 #### Standards documentation
 
-- [ ] Add `docs/SELECTOR_POLICY.md` (locator hierarchy — `getByRole` first)
+- [x] Add `docs/SELECTOR_POLICY.md` (locator hierarchy — `getByRole` first) — completed in Batch 1
 - [ ] Add first ADR: `docs/adr/0001-page-object-boundaries.md`
 - [ ] Add ADR: `docs/adr/0002-tag-based-execution-over-folder-tiers.md`
 
@@ -140,6 +185,8 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 > **No tier folders.** Tests stay in `tests/` root as `{feature}.spec.ts`.
 
+**Batch status:** **Not started — blocked on Batch 2.** Current state: `tests/smoke-internet.spec.ts` still exists; no `@smoke` / `@regression` tags; `tests/landing.spec.ts` imports `utils/test-data`; root `pages/` and `utils/` folders remain.
+
 ### Batch 3 — Checklist
 
 #### Consolidate into feature files
@@ -156,7 +203,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 #### Refactor to framework patterns
 
-- [ ] Replace direct `@playwright/test` imports with `@fixtures`
+- [x] Replace direct `@playwright/test` imports with `@fixtures` in `tests/landing.spec.ts` (partial — `smoke-internet.spec.ts` still uses `@playwright/test`)
 - [ ] Use injected page objects (`landingPage`, `addRemoveElementsPage`)
 - [ ] Remove `console.log` and legacy `utils/` imports
 - [ ] Delete empty root `pages/` and `utils/` folders
@@ -186,46 +233,49 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 **Objective:** Remote Gate 2 — CI runs in Playwright Docker using `--grep` tag filters. Failed gates **block merge**.
 
+**Batch status:** **Partial (~30%).** Docker files and local npm wrappers exist from Batch 1. GitHub Actions uses the Playwright container image (Noble fix) but runs the **full suite** — not yet the planned `lint → typecheck → test:smoke` dual-gate pipeline.
+
 ### Batch 4 — Checklist
 
 #### Docker parity
 
-- [ ] Create `docker/Dockerfile` pinned to Playwright version in `package.json`
-- [ ] Create `docker/docker-compose.yml` with services:
+- [x] Create `docker/Dockerfile` pinned to Playwright version in `package.json`
+- [x] Create `docker/docker-compose.yml` with services:
 
   ```yaml
-  # test:smoke  → npx playwright test --grep @smoke
-  # test:ci     → npx playwright test --grep-invert @flaky
-  # test        → npx playwright test
-  # lint        → npm run lint && npm run typecheck
+  # test-smoke      → npm run test:smoke
+  # test-ci         → npm run test:ci
+  # test-regression → npm run test:regression
+  # lint            → npm run lint && npm run typecheck
   ```
 
-- [ ] Verify: `docker compose run test:smoke` matches local `npm run test:smoke`
+- [ ] Verify: `docker compose run test-smoke` matches local `npm run test:smoke`
 
 #### GitHub Actions — tag-based CI (not folder-based)
 
-- [ ] Rename workflow → `.github/workflows/ci.yml`
+- [ ] Rename workflow → `.github/workflows/ci.yml` (currently `playwright.yml`)
 - [ ] Implement **blocking** CI stages:
 
   ```text
   lint → typecheck → test:smoke (PR) → test:ci (main)
   ```
 
-- [ ] PR pipeline: Run `@smoke` suite inside the official Playwright Docker image via `docker compose run --rm test:smoke`
+- [x] Run tests inside official Playwright Docker image (`mcr.microsoft.com/playwright:v1.59.1-noble`) — ad-hoc fix for Noble `install-deps` failure
+- [ ] PR pipeline: Run `@smoke` suite via `docker compose run --rm test-smoke` (currently runs full `npx playwright test`)
 - [ ] Main pipeline: `npx playwright test --grep-invert @flaky` inside Docker
 - [ ] Configure branch protection: **require CI pass to merge**
-- [ ] Add browser caching (`playwright install` cache)
+- [x] Browser install step removed — container image includes browsers (replaces deprecated `microsoft/playwright-github-action@v1`)
 
 #### Dual-gate enforcement
 
-- [ ] Gate 1 (local): documented in PR template — Cursor AI review + Husky (Batch 1)
+- [x] Gate 1 (local): documented in PR template — Cursor AI review + Husky (Batch 1)
 - [ ] Gate 2 (remote): CI lint + typecheck + Docker test run = **definitive merge gate**
-- [ ] Upload artifacts on failure: HTML report, JUnit XML, traces
+- [x] Upload HTML report artifact on workflow completion (partial — no JUnit or traces yet)
 - [ ] Add CI job summary table (pass/fail per browser) to PR checks
 
 #### Update Documentation
 
-- [ ] Update `README.md` and `CONTRIBUTING.md` with Docker commands
+- [ ] Update `README.md` and `CONTRIBUTING.md` with Docker commands (partial — README references Docker CI but migration state remains)
 - [ ] Document CI grep mapping: PR = `@smoke`, main = invert `@flaky`, nightly = `@regression`
 
 ### Batch 4 — Exit criteria
@@ -376,11 +426,13 @@ Batch 6 (Visibility)   Batch 7 (Culture + nightly @regression)
 
 ## Approval gate
 
-Before starting Batch 1, confirm:
+Architecture approved. Batch 1 merged (PR #1).
 
-1. Tag-based execution (no tier folders) is approved.
-2. AI standards in Batch 1 (not deferred) is approved.
-3. Dual-gate workflow (local Cursor + Husky → remote Docker CI) is approved.
-4. `BLUEPRINT.md` will be updated to match this roadmap (Batch 7 freeze).
+**Active gate — before starting Batch 2:**
 
-Once approved, implementation begins with **Batch 1 only**.
+1. Batch 1 exit criteria verified locally (`npm run lint && npm run typecheck && npm test`).
+2. Close Batch 1 gaps: `AGENTS.md`, README dual-gate setup section.
+3. Do not start Batch 3 until Batch 2 is merged and green in CI.
+4. Reserve full Batch 4 dual-gate work for after Batch 3 (tags must exist before `--grep` CI has value).
+
+**Next implementation target:** **Batch 2 — Framework Core** (single PR).
