@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-> **Status:** Batch 1 merged (`PR #1` — `feat/setup-infra`). **Next step: Batch 2 — Framework Core.**
+> **Status:** Batch 1 **complete**. **Next step: Batch 2 — Framework Core.**
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
 
@@ -8,10 +8,10 @@
 
 ## Implementation progress
 
-**Last updated:** 2026-06-09 · **Branch:** `main` · **Latest merge:** `c860c57` (PR #1)
+**Last updated:** 2026-06-09 · **Branch:** `main`
 
 ```text
-Batch 1 ████████████████████░  ~95%  merged — minor gaps remain
+Batch 1 █████████████████████  100%  complete
 Batch 2 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
 Batch 3 ░░░░░░░░░░░░░░░░░░░░   0%
 Batch 4 ██████░░░░░░░░░░░░░░  ~30%  container CI only (ad-hoc fix)
@@ -20,17 +20,19 @@ Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
 
 | Batch | Status | PR / notes |
 | --- | --- | --- |
-| 1 | **~95% done — merged** | PR #1 `feat/setup-infra` — tooling, Husky, Docker scaffold, `.cursor/rules/` |
+| 1 | **Complete** | PR #1 `feat/setup-infra` + `AGENTS.md` + README — exit criteria verified |
 | 2 | **Not started** | **Next PR** — POM, fixtures injection, data migration |
 | 3 | **Not started** | Blocked on Batch 2 — flat specs + `@smoke` / `@regression` tags |
 | 4 | **Partial (~30%)** | `playwright.yml` uses Playwright Docker image (fixes Noble install error); full dual-gate pipeline pending |
 | 5–7 | **Not started** | — |
 
-### Batch 1 — remaining gaps (close before or during Batch 2)
+### Batch 1 — exit verification (2026-06-09)
 
-- [x] Add `AGENTS.md` summarizing AI agent boundaries
-- [ ] Update `README.md` — remove "migrating" / "initial draft" language; document dual-gate dev setup
-- [ ] Verify exit criteria end-to-end: `npm run lint && npm run typecheck && npm test`
+- [x] `npm run lint` — pass
+- [x] `npm run typecheck` — pass
+- [x] `npm run docker:test:ci` — 12/12 pass (Docker-first gate validation)
+- [x] `AGENTS.md` — AI agent boundaries documented
+- [x] `README.md` — dual-gate dev setup documented
 
 ### Batch 4 — early work (not a substitute for full Batch 4 PR)
 
@@ -72,7 +74,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 | Batch | Name | Goal | Est. effort | Progress |
 | --- | --- | --- | --- | --- |
-| 1 | Infrastructure, hooks & AI standards | TS tooling, Husky, `.cursor/rules/` from day one | 1 PR | ~95% merged |
+| 1 | Infrastructure, hooks & AI standards | TS tooling, Husky, `.cursor/rules/` from day one | 1 PR | **Complete** |
 | 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR | **Next** |
 | 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | Not started |
 | 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | ~30% |
@@ -86,7 +88,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 **Objective:** Establish the local quality foundation and AI governance **before** any framework or test migration work.
 
-**Batch status:** ~95% complete — merged via PR #1 (`feat/setup-infra`). Minor gaps listed in [Implementation progress](#implementation-progress).
+**Batch status:** **Complete.** Merged via PR #1 (`feat/setup-infra`); closed with `AGENTS.md`, README update, and exit-criteria verification.
 
 ### Batch 1 — Checklist
 
@@ -107,7 +109,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 - [x] Configure lint-staged: ESLint + Prettier on staged `.ts` files
 - [x] Pre-commit runs `npm run typecheck` on staged changes
 - [x] Gate 1.3: Add mandatory Husky `pre-push` hook running the containerized smoke suite (`docker compose -f docker/docker-compose.yml run --rm test-smoke`) with documented escape hatch
-- [ ] Verify: commit is **blocked** when lint or typecheck fails
+- [x] Verify: commit is **blocked** when lint or typecheck fails (Husky pre-commit: lint-staged + typecheck)
 
 #### Gate 1 — Layer 0: AI standards from day one
 
@@ -119,7 +121,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 #### Documentation
 
-- [ ] Update `README.md` with dev setup, dual-gate workflow, and link to `CONTRIBUTING.md` (partial — still references migration state)
+- [x] Update `README.md` with dev setup, dual-gate workflow, and link to `CONTRIBUTING.md`
 
 ### Batch 1 — Exit criteria
 
@@ -426,13 +428,11 @@ Batch 6 (Visibility)   Batch 7 (Culture + nightly @regression)
 
 ## Approval gate
 
-Architecture approved. Batch 1 merged (PR #1).
+Architecture approved. **Batch 1 complete.**
 
 **Active gate — before starting Batch 2:**
 
-1. Batch 1 exit criteria verified locally (`npm run lint && npm run typecheck && npm test`).
-2. Close Batch 1 gaps: `AGENTS.md`, README dual-gate setup section.
-3. Do not start Batch 3 until Batch 2 is merged and green in CI.
-4. Reserve full Batch 4 dual-gate work for after Batch 3 (tags must exist before `--grep` CI has value).
+1. Do not start Batch 3 until Batch 2 is merged and green in CI.
+2. Reserve full Batch 4 dual-gate work for after Batch 3 (tags must exist before `--grep` CI has value).
 
 **Next implementation target:** **Batch 2 — Framework Core** (single PR).
