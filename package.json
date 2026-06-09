@@ -3,10 +3,29 @@
   "version": "1.0.0",
   "description": "Playwright test automation for the-internet.herokuapp.com",
   "scripts": {
-    "test": "npx playwright test",
-    "test:ui": "npx playwright test --ui",
-    "test:headed": "npx playwright test --headed",
-    "report": "npx playwright show-report"
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:e2e": "playwright test --grep @e2e",
+    "test:ci": "playwright test --grep-invert @flaky",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "docker:test:smoke": "docker compose -f docker/docker-compose.yml run --rm test-smoke",
+    "docker:test:regression": "docker compose -f docker/docker-compose.yml run --rm test-regression",
+    "docker:test:ci": "docker compose -f docker/docker-compose.yml run --rm test-ci",
+    "docker:lint": "docker compose -f docker/docker-compose.yml run --rm lint",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -14,6 +33,15 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "eslint": "^9.22.0",
+    "eslint-plugin-playwright": "^2.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.0"
   }
 }

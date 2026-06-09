@@ -1,12 +1,16 @@
 # Dependencies
 node_modules/
 
+# Environment
+.env
+
 # Playwright
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/reports/
 
 # MCP / exploration artifacts
 .playwright-mcp/
