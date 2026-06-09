@@ -1,4 +1,5 @@
 name: Playwright Tests
+
 on:
   push:
     branches: [main, master]
@@ -9,21 +10,22 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      CI: true
+      HOME: /root
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Playwright Browsers
-        uses: microsoft/playwright-github-action@v1
 
       - name: Run Playwright tests
         run: npx playwright test
