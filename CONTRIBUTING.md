@@ -300,19 +300,32 @@ Each run produces `reports/metrics/summary.json`:
 {
   "timestamp": "2026-06-01T12:00:00Z",
   "duration_ms": 45000,
-  "total": 24,
-  "passed": 23,
+  "total": 60,
+  "passed": 59,
   "failed": 1,
   "skipped": 0,
   "flaky": 0,
-  "pass_rate": 0.958,
+  "pass_rate": 0.983,
   "by_browser": {
-    "chromium": { "passed": 8, "failed": 0 },
-    "firefox":  { "passed": 8, "failed": 0 },
-    "webkit":   { "passed": 7, "failed": 1 }
+    "chromium": { "passed": 20, "failed": 0, "skipped": 0, "duration_ms": 90000 },
+    "firefox":  { "passed": 20, "failed": 0, "skipped": 0, "duration_ms": 95000 },
+    "webkit":   { "passed": 19, "failed": 1, "skipped": 0, "duration_ms": 92000 }
+  },
+  "by_tag": {
+    "@smoke": { "passed": 21, "failed": 0, "skipped": 0, "total": 21 },
+    "@regression": { "passed": 38, "failed": 1, "skipped": 0, "total": 39 }
   }
 }
 ```
+
+| Field | Meaning |
+| --- | --- |
+| `pass_rate` | `passed / total` — headline health KPI |
+| `by_browser` | Per-project breakdown (chromium, firefox, webkit) with durations |
+| `by_tag` | Per-tag tier breakdown — use for smoke vs regression dashboards |
+| `flaky` | Tests that passed after at least one retry |
+
+Reporter: `src/utils/reporters/metrics-reporter.ts` · CI artifact retention: 90 days.
 
 ### PM-friendly KPIs
 
@@ -325,16 +338,13 @@ Each run produces `reports/metrics/summary.json`:
 
 ### PR check summary
 
-CI posts a markdown summary on every PR:
+CI appends a markdown summary from `reports/metrics/summary.json` via `scripts/ci-test-summary.mjs`:
 
-```markdown
-## Test Results
-| Browser  | Passed | Failed | Duration |
-|----------|--------|--------|----------|
-| chromium | 4      | 0      | 32s      |
-| firefox  | 4      | 0      | 41s      |
-| webkit   | 4      | 0      | 38s      |
-```
+- Overall pass rate, flaky count, duration
+- **By browser** — passed / failed / skipped per project
+- **By tag** — `@smoke` vs `@regression` pass rate
+
+See [docs/TEST_STRATEGY.md](docs/TEST_STRATEGY.md) for how PMs and release owners should use these tiers.
 
 ---
 

@@ -67,6 +67,15 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
+      - name: Upload metrics report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrics-report-${{ github.event_name }}-${{ github.run_id }}
+          path: reports/metrics/
+          retention-days: 90
+          if-no-files-found: ignore
+
       - name: Upload traces on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -78,23 +87,4 @@ jobs:
 
       - name: Job summary
         if: always()
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            SUITE="@smoke"
-            SERVICE="test-smoke"
-            TESTS="9 (3 scenarios × 3 browsers)"
-          else
-            SUITE="invert @flaky"
-            SERVICE="test-ci"
-            TESTS="12 (4 scenarios × 3 browsers)"
-          fi
-          echo "## Gate 2 — Test Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| Event | \`${{ github.event_name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Grep filter | \`$SUITE\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Docker service | \`$SERVICE\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Expected tests | $TESTS |" >> $GITHUB_STEP_SUMMARY
-          echo "| Browsers | chromium · firefox · webkit |" >> $GITHUB_STEP_SUMMARY
-          echo "| Job status | \`${{ job.status }}\` |" >> $GITHUB_STEP_SUMMARY
+        run: node scripts/ci-test-summary.mjs "${{ github.event_name }}"
