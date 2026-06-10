@@ -124,4 +124,4 @@ Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — Gate 2 remo
 
 Artifacts on every run: HTML report, JUnit XML. Traces uploaded on failure.
 
-**Branch protection:** Require status checks **Lint & Typecheck** and **Tests (Docker)** on `main` — see [CONTRIBUTING.md §5](CONTRIBUTING.md).
+**Branch protection:** Import [`.github/rulesets/protect-main.json`](.github/rulesets/protect-main.json) — see [`.github/rulesets/README.md`](.github/rulesets/README.md).

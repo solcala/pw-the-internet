@@ -35,7 +35,7 @@ Batch 6–7 ░░░░░░░░░░░░░░░░░░░░   0%
 - [x] Main pipeline: `test-ci` (invert `@flaky`)
 - [x] Artifacts: HTML, JUnit; traces on failure
 - [x] Job summaries in GitHub Actions
-- [x] Branch protection documented in `CONTRIBUTING.md` §5 (manual repo setting)
+- [x] Branch protection — `.github/rulesets/protect-main.json` (import via UI or `gh api`)
 - [x] `playwright.config.ts` — `github` + `junit` reporters in CI
 
 ---
@@ -255,7 +255,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 - [x] PR pipeline: `docker compose run --rm test-smoke` (`@smoke` grep)
 - [x] Main pipeline: `docker compose run --rm test-ci` (invert `@flaky`)
-- [x] Branch protection documented — require CI status checks on `main` (manual repo setting)
+- [x] Branch protection — `.github/rulesets/protect-main.json` + README import steps
 - [x] Tests run inside Playwright Docker image via `docker/Dockerfile` (Compose build)
 
 #### Dual-gate enforcement
@@ -423,6 +423,6 @@ Architecture approved. **Batches 1–4 complete.**
 **Active gate — before starting Batch 5:**
 
 1. Batch 4 merged and green in CI.
-2. Enable branch protection on `main` (see `CONTRIBUTING.md` §5).
+2. Import branch protection ruleset (see `.github/rulesets/README.md`).
 
 **Next implementation target:** **Batch 5 — Coverage Expansion** (`dynamic-controls.spec.ts`).
