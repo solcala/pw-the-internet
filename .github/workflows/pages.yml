@@ -30,6 +30,16 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
           name: playwright-report-push-${{ github.event.workflow_run.id }}
+          # Extract into playwright-report/ — download flattens to workspace root by default.
+          path: playwright-report
+
+      - name: Verify report layout
+        run: |
+          if [ ! -f playwright-report/index.html ]; then
+            echo "::error::playwright-report/index.html not found after artifact download"
+            ls -laR .
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
