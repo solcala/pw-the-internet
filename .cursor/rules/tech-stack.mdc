@@ -4,52 +4,23 @@ globs: package.json,playwright.config.ts,docker/**/*,.github/workflows/**/*
 alwaysApply: false
 ---
 
-# Tech Stack & Environment Parity
+# Tech Stack & Docker
 
-## Docker-first execution (absolute parity)
+**Canonical sources:** [`docs/BLUEPRINT.md`](../../docs/BLUEPRINT.md) · [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §4–§7
 
-Local test runs **must default to Docker wrappers** — not bare-metal `npx playwright test` for gate validation.
+## Docker-first gate validation
 
 | Intent | Command |
 | --- | --- |
-| Smoke (`@smoke`) | `npm run docker:test:smoke` |
-| Regression (`@regression`) | `npm run docker:test:regression` |
-| Full CI suite | `npm run docker:test:ci` |
-| Lint + typecheck in container | `npm run docker:lint` |
+| Smoke | `npm run docker:test:smoke` |
+| Regression | `npm run docker:test:regression` |
+| CI suite | `npm run docker:test:ci` |
+| Lint + typecheck | `npm run docker:lint` |
 
-Underlying compose service (pre-push / CI parity):
+## Constraints
 
-```bash
-docker compose -f docker/docker-compose.yml run --rm test:smoke
-```
+- Pin Playwright Docker image to `package.json` version
+- No hardcoded credentials — config via `.env` → `src/config/environments.ts`
+- Document new env vars in `.env.example`
 
-> If it passes in Docker, it passes in CI. Never treat a local Node/OS-only run as definitive.
-
-## Pinned versions only
-
-- **Node:** LTS — match `.github/workflows` `node-version`
-- **Playwright:** `@playwright/test` version in `package.json` must match the `mcr.microsoft.com/playwright` Docker image tag
-- Do not float `latest` in `Dockerfile` or CI without explicit team approval
-
-## Environment & secrets
-
-- **Hardcoded credentials are forbidden** (`admin`, passwords, tokens in source)
-- All config flows through layers:
-
-```text
-.env.example  →  process.env  →  src/config/environments.ts  →  playwright.config.ts
-```
-
-- Use `test.skip()` when required env vars are missing — never fail silently
-- Document new variables in `.env.example` and `CONTRIBUTING.md` §7
-
-## CI alignment
-
-- PR pipeline: `@smoke` via `docker compose run --rm test:smoke`
-- Main pipeline: `docker compose run --rm test:ci` (`--grep-invert @flaky`)
-- GitHub Actions must use the same compose services as local Husky pre-push (Gate 1.3)
-
-## References
-
-- [`docs/BLUEPRINT.md`](../../docs/BLUEPRINT.md) — docker/ layout
-- [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §4–§5 — tag scripts & CI/CD parity
+Full CI/CD parity rules: [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §4–§5.

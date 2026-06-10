@@ -79,61 +79,33 @@ Implementation plan: [`docs/ROADMAP.md`](docs/ROADMAP.md)
 
 ## 3. Coding standards
 
-### 3.1 Locator hierarchy (strict order)
+> **Canonical sources** — do not duplicate rules elsewhere. Index: [`docs/README.md`](docs/README.md).
 
-1. `getByRole(role, { name })` — absolute priority
-2. `getByLabel()`
-3. `getByPlaceholder()`
-4. `getByTestId()` — when devs control `data-testid`
-5. `getByText()` — short, stable strings only
-6. CSS / XPath — **forbidden** unless isolated DOM limitation (mandatory inline `SELECTOR EXCEPTION:` comment)
-
-Full policy: [`docs/SELECTOR_POLICY.md`](docs/SELECTOR_POLICY.md) — audited at Gate 1.1.
-
-### 3.2 Page Object rules
-
-```typescript
-// ✅ DO: expose locators and actions
-readonly addButton = this.page.getByRole('button', { name: 'Add Element' });
-async addElements(count: number): Promise<void> { ... }
-
-// ❌ DON'T: assert inside page objects
-async addElements(count: number): Promise<void> {
-  await expect(this.deleteButtons).toHaveCount(count); // belongs in spec
-}
-```
-
-| Rule | Detail |
+| Topic | Canonical file |
 | --- | --- |
-| One page class per URL or major UI state | `AddRemoveElementsPage`, not `TheInternetPage` |
-| Locators are `readonly` | Defined in constructor or as class fields |
-| Actions return `Promise<void>` or data | Never return locators to specs |
-| Components for shared UI | Header, footer, modals → `src/pages/components/` |
-| Extend `BasePage` | Shared `goto`, `waitForLoaded`, URL helpers |
+| Locators, POM, sync policy | [`docs/SELECTOR_POLICY.md`](docs/SELECTOR_POLICY.md) |
+| Folder layout, layers, naming | [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) |
+| Why POM / tags (decisions) | [`docs/adr/`](docs/adr/) |
 
-### 3.3 Test rules
+### 3.1 Quick reference
 
 ```typescript
-// ✅ DO: import custom test with fixtures
+// Page object — locators + actions only
+readonly addButton = this.page.getByRole('button', { name: 'Add Element' });
+
+// Spec — assertions via fixtures
 import { test, expect } from '@fixtures';
 
-test('adds elements', async ({ addRemoveElementsPage }) => {
-  await addRemoveElementsPage.goto();
+test('adds elements @smoke', async ({ addRemoveElementsPage }) => {
+  await addRemoveElementsPage.open();
   await addRemoveElementsPage.addElements(3);
   await expect(addRemoveElementsPage.deleteButtons).toHaveCount(3);
 });
 ```
 
-| Rule | Detail |
-| --- | --- |
-| **Arrange → Act → Assert** | Clear three-phase structure |
-| One behavior per test | Multiple assertions OK if same behavior |
-| No `page.waitForTimeout()` | Use auto-waiting locators or `expect` polling |
-| No hardcoded URLs | Use `baseURL` + relative paths |
-| Tag appropriately | `@smoke`, `@regression`, `@flaky` |
-| Descriptive names | `adds 3 delete buttons when add is clicked 3 times` |
+Full locator hierarchy, POM rules, sync policy, and Gate 1.1 checklist: [`docs/SELECTOR_POLICY.md`](docs/SELECTOR_POLICY.md).
 
-### 3.4 File naming
+### 3.2 File naming
 
 | Type | Pattern | Example |
 | --- | --- | --- |
@@ -443,32 +415,20 @@ When asking Cursor to generate or review code, include:
 ```text
 Review my staged changes against CONTRIBUTING.md and docs/SELECTOR_POLICY.md.
 Check: getByRole hierarchy, no assertions in POMs, correct @smoke/@regression tags,
-@fixtures imports, no waitForTimeout. Report violations only — do not commit.
+@fixtures imports, no manual sync in POMs, no waitForTimeout. Report violations only — do not commit.
 ```
 
 ### 8.5 Local AI review checklist (Cursor Agent)
 
-Run this in Cursor **before every commit**, on staged or recently edited files:
-
-- [ ] Locators follow hierarchy: role → label → placeholder → testId → text (CSS/XPath forbidden unless exception comment)
-- [ ] No `expect()` or assertions inside page objects (`src/pages/`)
-- [ ] No `page.waitForTimeout()` or `page.pause()`
-- [ ] Imports use path aliases (`@fixtures`, `@pages`, `@data`)
-- [ ] Test titles include correct tag (`@smoke` or `@regression`)
-- [ ] One spec file per feature — tags in titles, not folder splits
-- [ ] No secrets or hardcoded credentials
-- [ ] Test names describe behavior, not implementation
+Run Gate 1.1 in Cursor **before every commit** using the checklist in [`docs/SELECTOR_POLICY.md`](docs/SELECTOR_POLICY.md) (Gate 1.1 section).
 
 If Cursor flags violations → fix locally → re-run review → only then proceed to `git commit`.
 
 ### 8.6 Cursor agent conventions
 
-Agent rules live in `.cursor/rules/` or `AGENTS.md` (Batch 1):
+Agent entry points: [`AGENTS.md`](AGENTS.md) · [`.cursor/rules/`](.cursor/rules/) · [`docs/README.md`](docs/README.md)
 
-- Always read `CONTRIBUTING.md` and `docs/SELECTOR_POLICY.md` before generating test code
-- Never create files outside `docs/BLUEPRINT.md` structure
-- AI review is **read-only audit** — never auto-commit or auto-push
-- One batch per PR — do not jump ahead on the roadmap
+Agent-only constraints (audit only, no auto-commit, one batch per PR) live in `AGENTS.md`. Coding rules are **not** duplicated there — always read the canonical sources listed in §3.
 
 ### 8.7 AI velocity & token optimization
 
@@ -497,6 +457,7 @@ Husky `pre-commit` scans **staged files** and **blocks the commit** if any of th
 | AI placeholder comments | `// TODO: AI Generated`, `// FIXME: AI` |
 | Unverified stubs | `// TODO: implement`, `pass`, `throw new Error('not implemented')` in test/POM files |
 | Debug artifacts | `page.pause()`, `console.log(` in committed test code |
+| Manual sync in POMs | `waitForLoaded()`, `locator.waitFor()`, `page.waitForTimeout()` in `src/pages/` |
 | Selector policy violations | Raw CSS/XPath without `SELECTOR EXCEPTION:` comment |
 
 This is Gate 1.2 enforcement — complementary to Gate 1.1 Cursor audit.
@@ -695,12 +656,12 @@ Copy into `.github/PULL_REQUEST_TEMPLATE.md` (or use as PR description):
 
 ## 10. Architecture Decision Records (ADRs)
 
-Significant decisions are documented in `docs/adr/`:
+Significant decisions are documented in `docs/adr/` — **why** a choice was made, not the full rule set. See [`docs/README.md`](docs/README.md).
 
 ```text
 docs/adr/
 ├── 0001-page-object-boundaries.md
-├── 0002-fixture-over-beforeeach.md
+├── 0002-tag-based-execution-over-folder-tiers.md
 └── template.md
 ```
 

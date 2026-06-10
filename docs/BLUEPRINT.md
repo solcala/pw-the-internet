@@ -16,7 +16,7 @@
 | **Dual-gate quality** | Gate 1: Cursor AI review + Husky → Gate 2: CI in Playwright Docker |
 | **CI/local parity** | Same commands inside Docker and on the developer machine |
 
-Related docs: [`ROADMAP.md`](ROADMAP.md) · [`SELECTOR_POLICY.md`](SELECTOR_POLICY.md) · [`CONTRIBUTING.md`](../CONTRIBUTING.md)
+Related docs: [`README.md`](README.md) (index) · [`ROADMAP.md`](ROADMAP.md) · [`SELECTOR_POLICY.md`](SELECTOR_POLICY.md) · [`CONTRIBUTING.md`](../CONTRIBUTING.md)
 
 ---
 
@@ -65,7 +65,7 @@ pw-the-internet/
 │   │   └── test-data.fixture.ts        # Scoped data per worker (optional)
 │   │
 │   ├── pages/
-│   │   ├── base.page.ts                # goto(), waitForLoaded(), shared helpers
+│   │   ├── base.page.ts                # goto(), shared navigation helpers
 │   │   ├── components/                 # Reusable UI fragments
 │   │   │   └── footer.component.ts
 │   │   └── the-internet/               # Feature-grouped page objects

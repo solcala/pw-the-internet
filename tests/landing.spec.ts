@@ -1,26 +1,24 @@
 import { test, expect } from '@fixtures';
-import { NAVIGATION_MAP } from '../utils/test-data';
+import { NAVIGATION_MAP } from '@data/navigation.map';
 
 test.describe('Landing Page', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+  test.beforeEach(async ({ landingPage }) => {
+    await landingPage.open();
   });
 
   test('has title', async ({ page }) => {
     await expect(page).toHaveTitle(/The Internet/);
   });
 
-  test('Validate page content', async ({ page }) => {
-    await expect.soft(page.getByRole('heading', { name: 'Welcome to the-internet' })).toBeVisible();
-    await expect.soft(page.getByRole('heading', { name: 'Available Examples' })).toBeVisible();
+  test('Validate page content', async ({ landingPage }) => {
+    await expect.soft(landingPage.welcomeHeading).toBeVisible();
+    await expect.soft(landingPage.examplesHeading).toBeVisible();
   });
 
   test.describe('link navigation', () => {
-    NAVIGATION_MAP.forEach((element) => {
-      const { name, path } = element;
-
-      test(`Validate navigation to ${name}`, async ({ page }) => {
-        await page.getByRole('link', { name: name }).click();
+    NAVIGATION_MAP.forEach(({ name, path }) => {
+      test(`Validate navigation to ${name}`, async ({ page, landingPage }) => {
+        await landingPage.navigateToLink(name);
         await expect(page).toHaveURL(new RegExp(`${path}`));
       });
     });

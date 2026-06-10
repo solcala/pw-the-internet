@@ -112,6 +112,33 @@ readonly rowDeleteButton = (rowText: string): Locator =>
 
 ---
 
+## Page Object synchronization
+
+Page objects are **locators and UI actions only**. Playwright auto-waiting handles actionability before interactions (`click`, `fill`, `check`).
+
+| ✅ Belongs in specs | ❌ Forbidden in page objects |
+| --- | --- |
+| `expect(locator).toBeVisible()` | `waitForLoaded()` |
+| `expect(locator).toHaveCount(n)` | `locator.waitFor({ state: ... })` |
+| Auto-waiting on actions | `page.waitForTimeout()`, `page.pause()` |
+
+**Default:** do not add manual synchronization to page objects.
+
+**Exception (rare):** a documented race condition that cannot be solved by web-first assertions, or a recurrent flaky test under active fix. Requires a mandatory inline comment explaining why manual wait is necessary.
+
+```typescript
+// ❌ Forbidden — readiness belongs in spec assertions
+async waitForLoaded(): Promise<void> {
+  await this.addButton.waitFor({ state: 'visible' });
+}
+
+// ✅ Spec — web-first assertion with auto-retry
+await addRemoveElementsPage.open();
+await expect(addRemoveElementsPage.addElementButton).toBeVisible();
+```
+
+---
+
 ## Spec file rules
 
 - Specs **must not** define locators — import page objects via `@fixtures`
@@ -129,6 +156,7 @@ Before every `git commit`, the developer runs Cursor Agent against staged files.
 - [ ] No locators defined in spec files (POM only)
 - [ ] No `getByText()` on interactive elements (buttons, links, inputs) — `getByRole` required
 - [ ] No `getByText()` for long or dynamic strings
+- [ ] No `waitForLoaded()`, `locator.waitFor()`, or manual sync in page objects
 - [ ] No `page.waitForTimeout()` as a locator workaround
 
 **Pre-commit review prompt:**
