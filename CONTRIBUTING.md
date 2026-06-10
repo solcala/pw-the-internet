@@ -267,14 +267,11 @@ Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
                               Artifacts: HTML, JUnit, traces (on failure)
 ```
 
-### Branch protection (repository setting)
+### Branch protection — block merge until CI passes
 
-Enable in GitHub → **Settings → Branches → Branch protection rules** for `main`:
+The CI workflow alone does **not** block merges. Import the ruleset JSON once per repository:
 
-- Require status checks: **Lint & Typecheck**, **Tests (Docker)**
-- Require branches to be up to date before merging
-
-This cannot be enforced via repo files alone — configure once per repository.
+**[`.github/rulesets/README.md`](.github/rulesets/README.md)** — `protect-main.json` import via GitHub UI or `gh api`.
 
 ### Artifact strategy
 

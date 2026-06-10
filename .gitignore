@@ -16,6 +16,9 @@ node_modules/
 .playwright-mcp/
 *.png
 
+# macOS
+.DS_Store
+
 # IDE
 .cursor/*
 !.cursor/rules/
