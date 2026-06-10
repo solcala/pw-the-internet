@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-> **Status:** Batch 4 **complete**. **Next step: Batch 5 — Coverage Expansion.**
+> **Status:** Batch 5 **complete**. **Next step: Batch 6 — Visibility & PM Metrics.**
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
 
@@ -8,15 +8,16 @@
 
 ## Implementation progress
 
-**Last updated:** 2026-06-09 · **Branch:** `main`
+**Last updated:** 2026-06-10 · **Branch:** `feat/coverage-expansion`
 
 ```text
 Batch 1 █████████████████████  100%  complete
 Batch 2 █████████████████████  100%  complete
 Batch 3 █████████████████████  100%  complete
 Batch 4 █████████████████████  100%  complete
-Batch 5 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
-Batch 6–7 ░░░░░░░░░░░░░░░░░░░░   0%
+Batch 5 █████████████████████  100%  complete
+Batch 6 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
+Batch 7 ░░░░░░░░░░░░░░░░░░░░   0%
 ```
 
 | Batch | Status | PR / notes |
@@ -25,7 +26,7 @@ Batch 6–7 ░░░░░░░░░░░░░░░░░░░░   0%
 | 2 | **Complete** | POM, fixtures injection, `navigation.map.ts`, ADRs — 12/12 Docker CI pass |
 | 3 | **Complete** | Tagged specs, `add-remove-elements.spec.ts`, smoke/regression grep verified |
 | 4 | **Complete** | `ci.yml` dual-gate — lint → Docker smoke (PR) / test-ci (main) |
-| 5 | **Not started** | **Next PR** — dynamic-controls, challenging-dom |
+| 5 | **Complete** | dynamic-controls, challenging-dom, navigation scale — 60/60 Docker CI pass |
 | 6–7 | **Not started** | — |
 
 ### Batch 4 — exit verification
@@ -69,8 +70,8 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 | 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR | **Complete** |
 | 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | **Complete** |
 | 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | **Complete** |
-| 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | **Next** |
-| 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | Not started |
+| 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | **Complete** |
+| 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | **Next** |
 | 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | Not started |
 
 ---
@@ -287,10 +288,12 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 ### Batch 5 — Checklist
 
+**Batch status:** **Complete.** Branch `feat/coverage-expansion` — lint, typecheck, Docker smoke/regression/ci verified.
+
 #### 5a — Dynamic Controls (PR 1)
 
-- [ ] Create `src/pages/the-internet/dynamic-controls.page.ts`
-- [ ] Create `tests/dynamic-controls.spec.ts` with structure:
+- [x] Create `src/pages/the-internet/dynamic-controls.page.ts`
+- [x] Create `tests/dynamic-controls.spec.ts` with structure:
 
   ```typescript
   test.describe('Dynamic Controls', () => {
@@ -305,32 +308,39 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
   });
   ```
 
-- [ ] Register page in `src/fixtures/pages.fixture.ts`
-- [ ] Run local Cursor AI review before commit
+- [x] Register page in `src/fixtures/pages.fixture.ts`
+- [x] Run local Cursor AI review before commit
 
 #### 5b — Challenging DOM (PR 2)
 
-- [ ] Create `src/pages/the-internet/challenging-dom.page.ts`
-- [ ] Create `tests/challenging-dom.spec.ts` with `test.describe` groups:
+- [x] Create `src/pages/the-internet/challenging-dom.page.ts`
+- [x] Create `tests/challenging-dom.spec.ts` with `test.describe` groups:
   - `test.describe('Button interactions', ...)` — `@smoke` happy paths
   - `test.describe('Table assertions', ...)` — `@regression` edge cases
   - `test.describe('Canvas rendering', ...)` — `@regression`
-- [ ] Register page in fixtures
+- [x] Register page in fixtures
 
 #### 5c — Navigation scale (PR 3)
 
-- [ ] Expand `src/data/navigation.map.ts` with top 10 landing links
-- [ ] Add navigation scenarios to `tests/landing.spec.ts` (same file — do not split)
-- [ ] Tag critical link (`Add/Remove Elements`) `@smoke`; remaining links `@regression`
-- [ ] Use parameterized `test.describe` loop over `NAVIGATION_MAP`
+- [x] Expand `src/data/navigation.map.ts` with top 10 landing links
+- [x] Add navigation scenarios to `tests/landing.spec.ts` (same file — do not split)
+- [x] Tag critical link (`Add/Remove Elements`) `@smoke`; remaining links `@regression`
+- [x] Use parameterized `test.describe` loop over `NAVIGATION_MAP`
 
 ### Batch 5 — Exit criteria
 
-- At least 5 page objects under `src/pages/the-internet/`.
-- Every new feature = one spec file (e.g. `dynamic-controls.spec.ts`, not tier subfolders).
-- Each file has ≥1 `@smoke` test and uses `test.describe` for positive/negative grouping.
-- `npm run test:smoke` still completes in < 2 minutes.
-- All new code passes Gate 1 (Cursor + Husky) and Gate 2 (CI Docker).
+- [x] Four feature page objects under `src/pages/the-internet/` (landing, add-remove-elements, dynamic-controls, challenging-dom).
+- [x] Every new feature = one spec file (e.g. `dynamic-controls.spec.ts`, not tier subfolders).
+- [x] Each file has ≥1 `@smoke` test and uses `test.describe` for positive/negative grouping.
+- [x] `npm run test:smoke` still completes in < 2 minutes (~1.8 min Docker).
+- [x] All new code passes Gate 1 (Cursor + Husky) and Gate 2 (CI Docker).
+
+### Batch 5 — Exit verification
+
+- [x] `npm run lint` + `npm run typecheck` — pass
+- [x] `npm run docker:test:smoke` — 21 passed
+- [x] `npm run docker:test:regression` — 39 passed
+- [x] `npm run docker:test:ci` — 60 passed
 
 ---
 
@@ -418,11 +428,11 @@ Batch 6 (Visibility)   Batch 7 (Culture + nightly @regression)
 
 ## Approval gate
 
-Architecture approved. **Batches 1–4 complete.**
+Architecture approved. **Batches 1–5 complete.**
 
-**Active gate — before starting Batch 5:**
+**Active gate — before starting Batch 6:**
 
-1. Batch 4 merged and green in CI.
-2. Import branch protection ruleset (see `.github/rulesets/README.md`).
+1. Batch 5 merged and green in CI.
+2. Smoke suite remains under 2 minutes on PR checks.
 
-**Next implementation target:** **Batch 5 — Coverage Expansion** (`dynamic-controls.spec.ts`).
+**Next implementation target:** **Batch 6 — Visibility & PM Metrics** (`metrics-reporter.ts`, GitHub Pages).

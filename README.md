@@ -24,7 +24,7 @@ Start at **[docs/README.md](docs/README.md)** — documentation index with canon
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Batch progress and checklist |
 | [AGENTS.md](AGENTS.md) | AI entry point — links to canonical docs |
 
-> **Current status:** Batch 4 complete (dual-gate CI). Batch 5 (coverage expansion) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Current status:** Batch 5 complete (coverage expansion). Batch 6 (visibility & metrics) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Project structure
 
@@ -34,7 +34,8 @@ Approved layout per [docs/BLUEPRINT.md](docs/BLUEPRINT.md):
 tests/                          # Flat — one file per feature domain
 ├── landing.spec.ts             # @smoke / @regression in titles
 ├── add-remove-elements.spec.ts
-└── dynamic-controls.spec.ts    # (Batch 5)
+├── dynamic-controls.spec.ts
+└── challenging-dom.spec.ts
 
 src/                            # Layered framework code
 ├── config/                     # environments.ts, test-tags.ts
@@ -104,13 +105,15 @@ Scenarios are grouped **by feature domain** in flat spec files. Tags in test tit
 
 | Spec | Tags | Coverage |
 | --- | --- | --- |
-| `tests/landing.spec.ts` | `@smoke`, `@regression` | Page title, headings (`@smoke`); link navigation (`@regression`) |
+| `tests/landing.spec.ts` | `@smoke`, `@regression` | Page title, headings (`@smoke`); 10 link navigations from `NAVIGATION_MAP` |
 | `tests/add-remove-elements.spec.ts` | `@smoke` | Add, verify, and remove dynamic elements |
+| `tests/dynamic-controls.spec.ts` | `@smoke`, `@regression` | Input enable/disable; checkbox show/hide (`test.describe` groups) |
+| `tests/challenging-dom.spec.ts` | `@smoke`, `@regression` | Action button click (`@smoke`); table data and canvas (`@regression`) |
 
 ```bash
-npm run test:smoke       # 3 scenarios × 3 browsers = 9 tests
-npm run test:regression  # 1 scenario × 3 browsers = 3 tests
-npm test                 # 4 scenarios × 3 browsers = 12 tests
+npm run test:smoke       # 7 scenarios × 3 browsers = 21 tests
+npm run test:regression  # 13 scenarios × 3 browsers = 39 tests
+npm test                 # 20 scenarios × 3 browsers = 60 tests
 ```
 
 ## CI
