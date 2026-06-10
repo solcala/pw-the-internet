@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-> **Status:** Batch 2 **complete**. **Next step: Batch 3 — Migrate Existing Tests.**
+> **Status:** Batch 3 **complete**. **Next step: Batch 4 — CI/CD, Docker & Dual-Gate.**
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
 
@@ -13,8 +13,8 @@
 ```text
 Batch 1 █████████████████████  100%  complete
 Batch 2 █████████████████████  100%  complete
-Batch 3 ████░░░░░░░░░░░░░░░░░  ~20%  ← NEXT (fixtures done; tags + rename pending)
-Batch 4 ██████░░░░░░░░░░░░░░  ~30%  container CI only (ad-hoc fix)
+Batch 3 █████████████████████  100%  complete
+Batch 4 ██████░░░░░░░░░░░░░░  ~30%  ← NEXT (container CI only; full dual-gate pending)
 Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
 ```
 
@@ -22,8 +22,8 @@ Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
 | --- | --- | --- |
 | 1 | **Complete** | PR #1 `feat/setup-infra` + `AGENTS.md` + README — exit criteria verified |
 | 2 | **Complete** | POM, fixtures injection, `navigation.map.ts`, ADRs — 12/12 Docker CI pass |
-| 3 | **Partial (~20%)** | **Next PR** — `@smoke` / `@regression` tags, rename `smoke-internet.spec.ts` |
-| 4 | **Partial (~30%)** | `playwright.yml` uses Playwright Docker image (fixes Noble install error); full dual-gate pipeline pending |
+| 3 | **Complete** | Tagged specs, `add-remove-elements.spec.ts`, smoke/regression grep verified |
+| 4 | **Partial (~30%)** | **Next PR** — `ci.yml` with lint → typecheck → `test:smoke` |
 | 5–7 | **Not started** | — |
 
 ### Batch 1 — exit verification (2026-06-09)
@@ -76,8 +76,8 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 | --- | --- | --- | --- | --- |
 | 1 | Infrastructure, hooks & AI standards | TS tooling, Husky, `.cursor/rules/` from day one | 1 PR | **Complete** |
 | 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR | **Complete** |
-| 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | **Next** |
-| 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | ~30% |
+| 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | **Complete** |
+| 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | **Next** |
 | 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | Not started |
 | 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | Not started |
 | 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | Not started |
@@ -187,21 +187,21 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 > **No tier folders.** Tests stay in `tests/` root as `{feature}.spec.ts`.
 
-**Batch status:** **Partial (~20%) — NEXT PR.** Specs use `@fixtures` and injected page objects; legacy `pages/` and `utils/` removed. Remaining: `@smoke` / `@regression` tags, rename `smoke-internet.spec.ts` → `add-remove-elements.spec.ts`.
+**Batch status:** **Complete.** Exit criteria verified — tag grep suites and full CI pass in Docker.
 
 ### Batch 3 — Checklist
 
 #### Consolidate into feature files
 
-- [ ] Refactor `tests/landing.spec.ts` — keep as `tests/landing.spec.ts` (flat, not moved to subfolder)
-- [ ] Merge `tests/smoke-internet.spec.ts` → `tests/add-remove-elements.spec.ts` (rename + consolidate)
-- [ ] Delete `tests/smoke-internet.spec.ts` after merge
+- [x] Refactor `tests/landing.spec.ts` — keep as `tests/landing.spec.ts` (flat, not moved to subfolder)
+- [x] Merge `tests/smoke-internet.spec.ts` → `tests/add-remove-elements.spec.ts` (rename + consolidate)
+- [x] Delete `tests/smoke-internet.spec.ts` after merge
 
 #### Apply tags in test titles
 
-- [ ] Add `@smoke` to critical-path tests (e.g. title loads, headings visible, core add/remove flow)
-- [ ] Add `@regression` to extended scenarios (e.g. parameterized navigation links)
-- [ ] Import `TAGS` from `src/config/test-tags.ts` where helpful for consistency
+- [x] Add `@smoke` to critical-path tests (e.g. title loads, headings visible, core add/remove flow)
+- [x] Add `@regression` to extended scenarios (e.g. parameterized navigation links)
+- [x] Import `TAGS` from `src/config/test-tags.ts` where helpful for consistency
 
 #### Refactor to framework patterns
 
@@ -212,14 +212,14 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 #### Documentation cleanup
 
-- [ ] Clean up `README.md` test coverage table: remove the temporary migration reference `(→ migrating to add-remove-elements.spec.ts)` and leave only the definitive `tests/add-remove-elements.spec.ts` filename.
+- [x] Clean up `README.md` test coverage table with definitive spec filenames and tag breakdown
 
 #### Verify tag-based execution
 
-- [ ] `npm run test:smoke` runs **only** `@smoke`-tagged tests (via `--grep`, not folders)
-- [ ] `npm run test:regression` runs **only** `@regression`-tagged tests
-- [ ] `npm test` runs the full suite across chromium, firefox, webkit
-- [ ] Confirm `playwright.config.ts` has **no** folder-based `testMatch` for tiers
+- [x] `npm run test:smoke` runs **only** `@smoke`-tagged tests (via `--grep`, not folders)
+- [x] `npm run test:regression` runs **only** `@regression`-tagged tests
+- [x] `npm test` runs the full suite across chromium, firefox, webkit
+- [x] Confirm `playwright.config.ts` has **no** folder-based `testMatch` for tiers
 
 ### Batch 3 — Exit criteria
 
@@ -428,11 +428,11 @@ Batch 6 (Visibility)   Batch 7 (Culture + nightly @regression)
 
 ## Approval gate
 
-Architecture approved. **Batches 1–2 complete.**
+Architecture approved. **Batches 1–3 complete.**
 
-**Active gate — before starting Batch 3:**
+**Active gate — before starting Batch 4:**
 
-1. Batch 2 merged and green in CI.
-2. Reserve full Batch 4 dual-gate work for after Batch 3 (tags must exist before `--grep` CI has value).
+1. Batch 3 merged and green in CI.
+2. `@smoke` grep suite is live — PR CI can now filter smoke tests meaningfully.
 
-**Next implementation target:** **Batch 3 — Migrate Existing Tests** (tags + rename `add-remove-elements.spec.ts`).
+**Next implementation target:** **Batch 4 — CI/CD, Docker & Dual-Gate** (`ci.yml` with lint → typecheck → `test:smoke`).

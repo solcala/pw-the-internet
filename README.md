@@ -24,7 +24,7 @@ Start at **[docs/README.md](docs/README.md)** — documentation index with canon
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Batch progress and checklist |
 | [AGENTS.md](AGENTS.md) | AI entry point — links to canonical docs |
 
-> **Current status:** Batch 2 complete (framework core — POM, fixtures, data layer). Batch 3 (test migration + tags) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Current status:** Batch 3 complete (flat specs + `@smoke` / `@regression` tags). Batch 4 (CI dual-gate) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Project structure
 
@@ -32,8 +32,8 @@ Approved layout per [docs/BLUEPRINT.md](docs/BLUEPRINT.md):
 
 ```text
 tests/                          # Flat — one file per feature domain
-├── landing.spec.ts
-├── add-remove-elements.spec.ts # (Batch 3)
+├── landing.spec.ts             # @smoke / @regression in titles
+├── add-remove-elements.spec.ts
 └── dynamic-controls.spec.ts    # (Batch 5)
 
 src/                            # Layered framework code
@@ -100,12 +100,18 @@ Full details, escape hatch (`git push --no-verify`), and PR checklist: [CONTRIBU
 
 ## Test coverage
 
-Scenarios are grouped **by feature domain** in flat spec files. Happy paths and negative/edge cases live in the same file, separated by `test.describe` blocks and tagged `@smoke` or `@regression` (tags applied in Batch 3).
+Scenarios are grouped **by feature domain** in flat spec files. Tags in test titles control suite tiers — not folder structure.
 
-| Spec | Coverage |
-| --- | --- |
-| `tests/landing.spec.ts` | Page title, headings, link navigation |
-| `tests/smoke-internet.spec.ts` | Add/Remove Elements — add, verify, remove |
+| Spec | Tags | Coverage |
+| --- | --- | --- |
+| `tests/landing.spec.ts` | `@smoke`, `@regression` | Page title, headings (`@smoke`); link navigation (`@regression`) |
+| `tests/add-remove-elements.spec.ts` | `@smoke` | Add, verify, and remove dynamic elements |
+
+```bash
+npm run test:smoke       # 3 scenarios × 3 browsers = 9 tests
+npm run test:regression  # 1 scenario × 3 browsers = 3 tests
+npm test                 # 4 scenarios × 3 browsers = 12 tests
+```
 
 ## CI
 

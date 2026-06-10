@@ -1,7 +1,8 @@
 import { test, expect } from '@fixtures';
+import { TAGS } from '@config/test-tags';
 
-test.describe('Smoke - The Internet', () => {
-  test('adds and removes dynamic elements', async ({ addRemoveElementsPage }) => {
+test.describe('Add/Remove Elements', () => {
+  test(`adds and removes dynamic elements ${TAGS.SMOKE}`, async ({ addRemoveElementsPage }) => {
     await addRemoveElementsPage.open();
     await addRemoveElementsPage.addElements(3);
     await expect(addRemoveElementsPage.deleteButtons).toHaveCount(3);
