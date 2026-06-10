@@ -12,7 +12,8 @@ Single entry point for project documentation. **Each topic has one canonical fil
 | **Progress** | [`ROADMAP.md`](ROADMAP.md) | Batch checklist and implementation status only |
 | **Test strategy** | [`TEST_STRATEGY.md`](TEST_STRATEGY.md) | Tag tiers, release decisions, suite shape |
 | **CI pipeline** | [`../.github/workflows/ci.yml`](../.github/workflows/ci.yml) | Gate 2 — lint → Docker tests (`@smoke` on PR) |
-| **Pages deploy** | [`../.github/workflows/pages.yml`](../.github/workflows/pages.yml) | Publish HTML report to GitHub Pages after green `main` CI |
+| **Pages deploy** | [`../.github/workflows/pages.yml`](../.github/workflows/pages.yml) | `playwright-report/` after green `main` CI |
+| **Code ownership** | [`../.github/CODEOWNERS`](../.github/CODEOWNERS) | Auto-review requests for `src/` and `tests/` |
 
 ## Decision log (why, not how)
 
@@ -22,6 +23,8 @@ Single entry point for project documentation. **Each topic has one canonical fil
 | [`adr/0002-tag-based-execution-over-folder-tiers.md`](adr/0002-tag-based-execution-over-folder-tiers.md) | Why tags + `--grep` replace `tests/smoke/` folders |
 
 ADRs record context and trade-offs. **Do not duplicate rules from the canonical files above.**
+
+New ADR: copy [`adr/template.md`](adr/template.md) — process in [`CONTRIBUTING.md` §10](../CONTRIBUTING.md).
 
 ## AI assistants
 

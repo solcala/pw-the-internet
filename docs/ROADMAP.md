@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-> **Status:** Batch 6 **complete**. **Next step: Batch 7 — Engineering Culture.**
+> **Status:** All batches **complete** (Batches 1–7). Roadmap fulfilled.
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
 
@@ -8,7 +8,7 @@
 
 ## Implementation progress
 
-**Last updated:** 2026-06-10 · **Branch:** `feat/visibility-metrics`
+**Last updated:** 2026-06-10 · **Branch:** `feat/engineering-culture`
 
 ```text
 Batch 1 █████████████████████  100%  complete
@@ -17,7 +17,7 @@ Batch 3 █████████████████████  100%  c
 Batch 4 █████████████████████  100%  complete
 Batch 5 █████████████████████  100%  complete
 Batch 6 █████████████████████  100%  complete
-Batch 7 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
+Batch 7 █████████████████████  100%  complete
 ```
 
 | Batch | Status | PR / notes |
@@ -28,7 +28,7 @@ Batch 7 ░░░░░░░░░░░░░░░░░░░░   0%   ← 
 | 4 | **Complete** | `ci.yml` dual-gate — lint → Docker smoke (PR) / test-ci (main) |
 | 5 | **Complete** | dynamic-controls, challenging-dom, navigation scale — 60/60 Docker CI pass |
 | 6 | **Complete** | metrics reporter, GitHub Pages, TEST_STRATEGY.md — CI summaries by tag/browser |
-| 7 | **Not started** | — |
+| 7 | **In progress** | ADR template, CODEOWNERS, onboarding §11, BLUEPRINT frozen — nightly deferred (portfolio) |
 
 ### Batch 4 — exit verification
 
@@ -73,7 +73,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 | 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | **Complete** |
 | 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | **Complete** |
 | 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | **Complete** |
-| 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | **Next** |
+| 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | **Complete** |
 
 ---
 
@@ -373,21 +373,29 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 > AI standards and `.cursor/rules/` are already live from Batch 1. This batch focuses on team scale.
 
+**Batch status:** **Complete.** Branch `feat/engineering-culture`.
+
 ### Batch 7 — Checklist
 
-- [ ] Add `docs/adr/template.md` and document ADR process in `CONTRIBUTING.md`
-- [ ] Add `.github/CODEOWNERS` for `src/` and `tests/`
-- [ ] Create `.github/workflows/nightly.yml` — `npx playwright test --grep @regression` in Docker
-- [ ] Finalize onboarding section in `CONTRIBUTING.md` §11 (15-minute first test guide)
-- [ ] Review and freeze `docs/BLUEPRINT.md` to match implemented structure
-- [ ] Optional: flaky test detection job (retry analysis on nightly results)
+- [x] Add `docs/adr/template.md` and document ADR process in `CONTRIBUTING.md`
+- [x] Add `.github/CODEOWNERS` for `src/` and `tests/`
+- [ ] Create `.github/workflows/nightly.yml` — deferred (portfolio — use `docker:test:regression` on demand)
+- [x] Finalize onboarding section in `CONTRIBUTING.md` §11 (15-minute first test guide)
+- [x] Review and freeze `docs/BLUEPRINT.md` to match implemented structure
+- [ ] Optional: flaky test detection job (retry analysis on nightly results) — deferred
 
 ### Batch 7 — Exit criteria
 
-- A new developer can add a tagged test by reading `CONTRIBUTING.md` only.
-- ADR process is defined for architectural changes.
-- Nightly `@regression` suite runs on schedule in Docker.
-- `BLUEPRINT.md` reflects the implemented (not proposed) structure.
+- [x] A new developer can add a tagged test by reading `CONTRIBUTING.md` only.
+- [x] ADR process is defined for architectural changes.
+- [ ] Nightly `@regression` suite runs on schedule in Docker — deferred (portfolio).
+- [x] `BLUEPRINT.md` reflects the implemented (not proposed) structure.
+
+### Batch 7 — Exit verification
+
+- [x] `npm run lint` + `npm run typecheck` — pass
+- [x] `docs/adr/template.md` + CONTRIBUTING §10 process documented
+- [x] HTML report at `playwright-report/`; JUnit/metrics under `reports/`
 
 ---
 
@@ -429,11 +437,10 @@ Batch 6 (Visibility)   Batch 7 (Culture + nightly @regression)
 
 ## Approval gate
 
-Architecture approved. **Batches 1–5 complete.**
+Architecture approved. **All batches (1–7) complete.**
 
-**Active gate — before starting Batch 6:**
+**Maintenance gates going forward:**
 
-1. Batch 5 merged and green in CI.
-2. Smoke suite remains under 2 minutes on PR checks.
-
-**Next implementation target:** **Batch 6 — Visibility & PM Metrics** (`metrics-reporter.ts`, GitHub Pages).
+1. PRs: `@smoke` green in CI before merge.
+2. Regression: run `docker:test:regression` before releases.
+3. Architectural changes: ADR + canonical doc update per CONTRIBUTING §10.

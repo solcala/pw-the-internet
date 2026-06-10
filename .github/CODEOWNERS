@@ -1,0 +1,5 @@
+# Code owners — auto-request review on PRs touching framework or test code.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+/src/   @solcala
+/tests/ @solcala

@@ -14,10 +14,28 @@ if (!summaryFile) {
   process.exit(0);
 }
 
-const suiteMeta =
-  eventName === 'pull_request'
-    ? { filter: '@smoke', service: 'test-smoke', expected: '21 (7 scenarios × 3 browsers)' }
-    : { filter: 'invert @flaky', service: 'test-ci', expected: '60 (20 scenarios × 3 browsers)' };
+const SUITE_META = {
+  pull_request: {
+    filter: '@smoke',
+    service: 'test-smoke',
+    expected: '21 (7 scenarios × 3 browsers)',
+    title: 'Gate 2 — Test Results',
+  },
+  push: {
+    filter: 'invert @flaky',
+    service: 'test-ci',
+    expected: '60 (20 scenarios × 3 browsers)',
+    title: 'Gate 2 — Test Results',
+  },
+  regression: {
+    filter: '@regression',
+    service: 'test-regression',
+    expected: '39 (13 scenarios × 3 browsers)',
+    title: 'Nightly — Regression Results',
+  },
+};
+
+const suiteMeta = SUITE_META[eventName] ?? SUITE_META.push;
 
 let summary;
 try {
@@ -26,7 +44,7 @@ try {
   appendFileSync(
     summaryFile,
     [
-      '## Gate 2 — Test Results',
+      `## ${suiteMeta.title}`,
       '',
       `_Metrics file not found at \`${summaryPath}\`. Run tests with the metrics reporter enabled._`,
       '',
@@ -58,7 +76,7 @@ const tagRows = Object.entries(summary.by_tag ?? {})
 appendFileSync(
   summaryFile,
   [
-    '## Gate 2 — Test Results',
+    `## ${suiteMeta.title}`,
     '',
     '| Item | Value |',
     '| --- | --- |',

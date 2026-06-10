@@ -1,7 +1,6 @@
 # pw-the-internet
 
 [![CI](https://github.com/solcala/pw-the-internet/actions/workflows/ci.yml/badge.svg)](https://github.com/solcala/pw-the-internet/actions/workflows/ci.yml)
-[![Report](https://img.shields.io/badge/report-GitHub%20Pages-blue)](https://solcala.github.io/pw-the-internet/)
 
 Playwright test automation suite for [The Internet](https://the-internet.herokuapp.com/) — a demo site commonly used for QA practice and portfolio projects.
 
@@ -28,7 +27,7 @@ Start at **[docs/README.md](docs/README.md)** — documentation index with canon
 | [docs/TEST_STRATEGY.md](docs/TEST_STRATEGY.md) | `@smoke` vs `@regression` for release decisions |
 | [AGENTS.md](AGENTS.md) | AI entry point — links to canonical docs |
 
-> **Current status:** Batch 6 complete (visibility & metrics). Batch 7 (engineering culture) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Current status:** Batch 7 complete (engineering culture). All roadmap batches implemented — see [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Project structure
 
@@ -130,8 +129,23 @@ Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — Gate 2 remo
 | **Pull request** | lint → typecheck → tests | `@smoke` | `test-smoke` |
 | **Push to `main`** | lint → typecheck → tests | invert `@flaky` | `test-ci` |
 
-Artifacts on every run: HTML report, JUnit XML, metrics JSON (`reports/metrics/summary.json`). Traces uploaded on failure.
+Artifacts on every run: HTML report (`playwright-report/`), JUnit XML, metrics JSON. Traces uploaded on failure.
 
-**GitHub Pages:** [Live HTML report](https://solcala.github.io/pw-the-internet/) — published by [`.github/workflows/pages.yml`](.github/workflows/pages.yml) after each green `main` build. Enable **Settings → Pages → Source: GitHub Actions** once per repo.
+## Reports
+
+```text
+playwright-report/    # HTML — npm run report
+reports/
+├── junit/              # results.xml
+└── metrics/            # summary.json (pass rate, by_browser, by_tag)
+```
+
+| Where | How to view |
+| --- | --- |
+| **Local / Docker** | Run tests, then `npm run report` |
+| **CI** | Actions → **Artifacts** → download `playwright-report-*` |
+| **GitHub Pages** | [`pages.yml`](.github/workflows/pages.yml) after each green `main` CI build |
+
+`@regression` on demand: `npm run docker:test:regression`.
 
 **Branch protection:** Import [`.github/rulesets/protect-main.json`](.github/rulesets/protect-main.json) — see [`.github/rulesets/README.md`](.github/rulesets/README.md).

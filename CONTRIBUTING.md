@@ -13,7 +13,7 @@
 | **Technical depth** | Typed fixtures, POM boundaries, locator policy, Docker parity |
 | **Scalability** | Layered `src/` framework, tag-based tiers (`@smoke` / `@regression`) |
 | **Engineering culture** | CONTRIBUTING standards, ADRs, PR templates, AI review gates |
-| **Stakeholder visibility** | GitHub Pages reports, PM-friendly metrics |
+| **Stakeholder visibility** | CI artifacts, `npm run report`, PM-friendly metrics JSON |
 | **Maintainability** | One concern per file, no locator duplication, env-based config |
 
 ### Who this is for
@@ -151,7 +151,7 @@ Tiers are **tags**, not folders. Playwright's `--grep` flag filters which tests 
 | Tier | Tag | Trigger | Target time |
 | --- | --- | --- | --- |
 | **Smoke** | `@smoke` | Every PR, pre-push hook | < 2 min |
-| **Regression** | `@regression` | Merge to `main`, nightly | < 15 min |
+| **Regression** | `@regression` | Pre-release, on demand | < 15 min |
 | **E2E** | `@e2e` | Release branches, weekly | Variable |
 
 A single feature file contributes tests to multiple tiers:
@@ -229,7 +229,7 @@ export default defineConfig({
 | Local | auto (50%) | 0 | on-first-retry | developer choice |
 | CI (PR) | 1 | 1 | on-first-retry | `@smoke` |
 | CI (main) | 2 | 2 | retain-on-failure | invert `@flaky` |
-| CI (nightly) | 2 | 2 | retain-on-failure | `@regression` |
+| Local / Docker regression | 2 | 2 | retain-on-failure | `@regression` |
 
 ---
 
@@ -277,7 +277,7 @@ The CI workflow alone does **not** block merges. Import the ruleset JSON once pe
 
 | Artifact | When | Retention | Consumer |
 | --- | --- | --- | --- |
-| HTML report | Every run | 30 days | Developers, GitHub Pages |
+| HTML report (`playwright-report/`) | Every run | 30 days | Developers, GitHub Pages |
 | JUnit XML | Every run | 30 days | CI dashboards, PR annotations |
 | Traces | On failure | 7 days | Debugging |
 | Metrics JSON | Every run | 90 days | PM dashboards |
@@ -286,11 +286,18 @@ The CI workflow alone does **not** block merges. Import the ruleset JSON once pe
 
 ## 6. Visibility & PM metrics
 
-### GitHub Pages (HTML report)
+### Viewing HTML reports
 
-- Workflow `pages.yml` publishes the latest `main` branch report.
-- README badge links directly to the live report.
-- PMs and stakeholders can browse pass/fail without installing anything.
+**Local (after any test run):**
+
+```bash
+npm run docker:test:smoke   # or test:ci, test:regression
+npm run report              # opens playwright-report/
+```
+
+**CI:** Download the `playwright-report-*` artifact from Actions, extract, then `npm run report`.
+
+**GitHub Pages:** [`pages.yml`](.github/workflows/pages.yml) publishes `playwright-report/` after each green `main` CI build.
 
 ### Metrics reporter (custom)
 
@@ -673,7 +680,7 @@ Copy into `.github/PULL_REQUEST_TEMPLATE.md` (or use as PR description):
 
 ## 10. Architecture Decision Records (ADRs)
 
-Significant decisions are documented in `docs/adr/` — **why** a choice was made, not the full rule set. See [`docs/README.md`](docs/README.md).
+Significant decisions are documented in `docs/adr/` — **why** a choice was made, not the full rule set. Operational rules stay in canonical docs (`SELECTOR_POLICY.md`, `BLUEPRINT.md`). See [`docs/README.md`](docs/README.md).
 
 ```text
 docs/adr/
@@ -684,41 +691,121 @@ docs/adr/
 
 ### When to write an ADR
 
+Write an ADR **before** merging when the change affects architecture or long-term conventions:
+
 - Choosing fixture pattern over `beforeEach`
 - Adding a new test tier or tag
 - Changing CI parallelism strategy
 - Adopting a new reporter or Docker base image
+- Moving assertions into page objects (should be rejected — document why in an ADR if debated)
+
+Skip ADRs for routine feature tests, locator tweaks, or bug fixes that follow existing patterns.
+
+### ADR process
+
+1. Copy [`docs/adr/template.md`](docs/adr/template.md) → `docs/adr/NNNN-short-title.md` (next sequential number).
+2. Set **Status** to `Proposed` and fill Context / Decision / Consequences.
+3. Link the ADR in your PR description.
+4. After merge, set **Status** to `Accepted` (same PR or follow-up).
+5. Add a one-line entry to the ADR table in [`docs/README.md`](docs/README.md).
+6. If the decision changes executable rules, update the **canonical** doc — do not duplicate rules inside the ADR.
 
 ### ADR template
 
-```markdown
-# ADR-NNNN: Title
-
-## Status
-Proposed | Accepted | Deprecated
-
-## Context
-What is the issue?
-
-## Decision
-What did we decide?
-
-## Consequences
-What are the trade-offs?
-```
+Use [`docs/adr/template.md`](docs/adr/template.md). Existing examples: ADR-0001, ADR-0002.
 
 ---
 
 ## 11. Onboarding: your first test in 15 minutes
 
-1. Clone repo, run `npm install && npx playwright install`
-2. Read `docs/BLUEPRINT.md` (2 min)
-3. Copy an existing smoke spec as template
-4. Create page object in `src/pages/the-internet/`
-5. Register page in `src/fixtures/pages.fixture.ts`
-6. Write spec in `tests/{feature}.spec.ts` using `@fixtures` import and tags
-7. Run `npm run test:smoke`
-8. Open PR using the template
+Goal: add one `@smoke` scenario for a new page using fixtures, POM, and tags — without reading the whole repo.
+
+### 0. Setup (3 min)
+
+```bash
+git clone git@github.com:solcala/pw-the-internet.git
+cd pw-the-internet
+npm install
+cp .env.example .env   # optional — defaults work
+npm run docker:test:smoke   # verify environment (Docker-first, matches CI)
+```
+
+Local bare-metal (optional): `npx playwright install` then `npm run test:smoke`.
+
+### 1. Pick a feature (1 min)
+
+Choose a page under [the-internet.herokuapp.com](https://the-internet.herokuapp.com/) — e.g. `/checkboxes`. Skim [`docs/SELECTOR_POLICY.md`](docs/SELECTOR_POLICY.md) locator order: `getByRole` → `getByLabel` → `getByTestId`.
+
+### 2. Page object (4 min)
+
+Create `src/pages/the-internet/checkboxes.page.ts`:
+
+```typescript
+import type { Locator, Page } from '@playwright/test';
+import { BasePage } from '@pages/base.page';
+
+export class CheckboxesPage extends BasePage {
+  readonly firstCheckbox: Locator;
+
+  constructor(page: Page) {
+    super(page);
+    this.firstCheckbox = page.getByRole('checkbox').first();
+  }
+
+  async open(): Promise<void> {
+    await this.goto('/checkboxes');
+  }
+
+  async toggleFirst(): Promise<void> {
+    await this.firstCheckbox.click();
+  }
+}
+```
+
+Rules: locators + actions only — **no** `expect()`, **no** `waitForLoaded()`.
+
+### 3. Register fixture (2 min)
+
+In `src/fixtures/pages.fixture.ts`:
+
+- Import `CheckboxesPage`
+- Add `checkboxesPage: CheckboxesPage` to `PageFixtures`
+- Extend with `checkboxesPage: async ({ page }, use) => { await use(new CheckboxesPage(page)); }`
+
+### 4. Spec file (3 min)
+
+Create `tests/checkboxes.spec.ts`:
+
+```typescript
+import { test, expect } from '@fixtures';
+import { TAGS } from '@config/test-tags';
+
+test.describe('Checkboxes', () => {
+  test.beforeEach(async ({ checkboxesPage }) => {
+    await checkboxesPage.open();
+  });
+
+  test(`toggles first checkbox ${TAGS.SMOKE}`, async ({ checkboxesPage }) => {
+    await checkboxesPage.toggleFirst();
+    await expect(checkboxesPage.firstCheckbox).toBeChecked();
+  });
+});
+```
+
+Tags go in the **title** via `TAGS` constants — never in folder names.
+
+### 5. Verify gates (2 min)
+
+```bash
+npm run lint && npm run typecheck
+npm run docker:test:smoke
+```
+
+### 6. Open PR
+
+Use [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md). PR CI runs `@smoke` only. Add `@regression` scenarios in the same file under a `test.describe` group when you expand coverage.
+
+**Reference implementations:** `tests/add-remove-elements.spec.ts`, `src/pages/the-internet/add-remove-elements.page.ts`.
 
 ---
 
@@ -740,7 +827,7 @@ The folder structure, fixture pattern, test tiers, and CI stages remain identica
 
 | Document | Purpose |
 | --- | --- |
-| [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) | Target folder structure |
+| [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) | Implemented folder structure (frozen) |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Batch implementation plan |
 | [`docs/SELECTOR_POLICY.md`](docs/SELECTOR_POLICY.md) | Locator hierarchy — Gate 1.1 audit standard |
 | [`docs/AI_VELOCITY_LOG.md`](docs/AI_VELOCITY_LOG.md) | Per-batch AI efficiency tracking (§8.7) |
