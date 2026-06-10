@@ -17,8 +17,8 @@ test.describe('Landing Page', () => {
   });
 
   test.describe('link navigation', () => {
-    NAVIGATION_MAP.forEach(({ name, path }) => {
-      test(`Validate navigation to ${name} ${TAGS.REGRESSION}`, async ({ page, landingPage }) => {
+    NAVIGATION_MAP.forEach(({ name, path, tag }) => {
+      test(`Validate navigation to ${name} ${tag}`, async ({ page, landingPage }) => {
         await landingPage.navigateToLink(name);
         await expect(page).toHaveURL(new RegExp(`${path}`));
       });
