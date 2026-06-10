@@ -11,9 +11,9 @@
 
 ## Gate 2 — Remote (CI)
 
-- [ ] GitHub Actions CI green on this PR
-- [ ] Smoke suite (`@smoke`) passed inside Playwright Docker image
-- [ ] No new lint / typecheck errors in CI
+- [ ] [`.github/workflows/ci.yml`](.github/workflows/ci.yml) green on this PR
+- [ ] **Lint & Typecheck** job passed (`docker compose run --rm lint`)
+- [ ] **Tests (Docker)** job passed — `@smoke` via `test-smoke` service
 
 ## Test changes
 

@@ -246,24 +246,35 @@ export default defineConfig({
 docker compose -f docker/docker-compose.yml build
 
 # Run smoke (same as CI PR check)
-docker compose -f docker/docker-compose.yml run --rm test:smoke
+docker compose -f docker/docker-compose.yml run --rm test-smoke
 
-# Run full suite (same as CI main)
-docker compose -f docker/docker-compose.yml run --rm test
+# Run full CI suite (same as CI main — invert @flaky)
+docker compose -f docker/docker-compose.yml run --rm test-ci
 ```
 
 ### CI pipeline stages
 
+Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+
 ```text
-┌──────────┐   ┌────────────┐   ┌─────────────┐   ┌──────────────────┐
-│   Lint   │──►│ Typecheck  │──►│ Smoke tests │──►│ Regression tests │
-│  ESLint  │   │    tsc     │   │  (PR only)  │   │   (main only)    │
-└──────────┘   └────────────┘   └─────────────┘   └──────────────────┘
-                                        │                    │
-                                        ▼                    ▼
-                                 Upload artifacts     Publish to Pages
-                                 (trace, JUnit)       (HTML report)
+┌─────────────────────┐     ┌──────────────────────────────────────┐
+│  lint (Docker)      │────►│  test (Docker)                       │
+│  ESLint + typecheck │     │  PR  → test-smoke  (@smoke)          │
+└─────────────────────┘     │  main → test-ci    (invert @flaky)   │
+                            └──────────────────────────────────────┘
+                                         │
+                                         ▼
+                              Artifacts: HTML, JUnit, traces (on failure)
 ```
+
+### Branch protection (repository setting)
+
+Enable in GitHub → **Settings → Branches → Branch protection rules** for `main`:
+
+- Require status checks: **Lint & Typecheck**, **Tests (Docker)**
+- Require branches to be up to date before merging
+
+This cannot be enforced via repo files alone — configure once per repository.
 
 ### Artifact strategy
 
@@ -578,18 +589,17 @@ git push --no-verify
 ### Gate 2 — Remote (CI/CD)
 
 **When:** After a clean local commit is pushed and a PR is opened.
-**Where:** GitHub Actions, inside the **official Playwright Docker image**.
+**Where:** GitHub Actions — [`.github/workflows/ci.yml`](.github/workflows/ci.yml) via Docker Compose (same services as local pre-push).
 
 ```text
 PR opened
-  → lint (ESLint)
-  → typecheck (tsc)
-  → test:smoke --grep @smoke        # PR gate
-  → upload artifacts (report, traces on failure)
+  → docker compose run --rm lint
+  → docker compose run --rm test-smoke   # @smoke grep
+  → upload artifacts (HTML, JUnit, traces on failure)
 
-Merge to main
-  → test:ci --grep-invert @flaky    # full suite minus flaky
-  → publish HTML report to GitHub Pages
+Push to main
+  → docker compose run --rm lint
+  → docker compose run --rm test-ci      # invert @flaky
 ```
 
 CI is the **definitive validation gate**. It seals the automation quality loop — local gates catch issues early; CI proves parity across the containerized environment every teammate and pipeline shares.

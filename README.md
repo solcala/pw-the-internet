@@ -24,7 +24,7 @@ Start at **[docs/README.md](docs/README.md)** — documentation index with canon
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Batch progress and checklist |
 | [AGENTS.md](AGENTS.md) | AI entry point — links to canonical docs |
 
-> **Current status:** Batch 3 complete (flat specs + `@smoke` / `@regression` tags). Batch 4 (CI dual-gate) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Current status:** Batch 4 complete (dual-gate CI). Batch 5 (coverage expansion) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Project structure
 
@@ -115,6 +115,13 @@ npm test                 # 4 scenarios × 3 browsers = 12 tests
 
 ## CI
 
-Tests run on push and pull requests to `main` / `master` via GitHub Actions inside the official Playwright Docker image (`v1.59.1-noble`). The HTML report is uploaded as a workflow artifact.
+Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — Gate 2 remote validation via Docker Compose (same commands as local pre-push).
 
-Full dual-gate CI (`lint → typecheck → test:smoke` on PRs) is planned in Batch 4 — see [docs/ROADMAP.md](docs/ROADMAP.md).
+| Event | Stages | Test filter | Docker service |
+| --- | --- | --- | --- |
+| **Pull request** | lint → typecheck → tests | `@smoke` | `test-smoke` |
+| **Push to `main`** | lint → typecheck → tests | invert `@flaky` | `test-ci` |
+
+Artifacts on every run: HTML report, JUnit XML. Traces uploaded on failure.
+
+**Branch protection:** Require status checks **Lint & Typecheck** and **Tests (Docker)** on `main` — see [CONTRIBUTING.md §5](CONTRIBUTING.md).
