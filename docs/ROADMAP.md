@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-> **Status:** Batch 1 **complete**. **Next step: Batch 2 — Framework Core.**
+> **Status:** Batch 2 **complete**. **Next step: Batch 3 — Migrate Existing Tests.**
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
 
@@ -12,8 +12,8 @@
 
 ```text
 Batch 1 █████████████████████  100%  complete
-Batch 2 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
-Batch 3 ░░░░░░░░░░░░░░░░░░░░   0%
+Batch 2 █████████████████████  100%  complete
+Batch 3 ████░░░░░░░░░░░░░░░░░  ~20%  ← NEXT (fixtures done; tags + rename pending)
 Batch 4 ██████░░░░░░░░░░░░░░  ~30%  container CI only (ad-hoc fix)
 Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
 ```
@@ -21,8 +21,8 @@ Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
 | Batch | Status | PR / notes |
 | --- | --- | --- |
 | 1 | **Complete** | PR #1 `feat/setup-infra` + `AGENTS.md` + README — exit criteria verified |
-| 2 | **Not started** | **Next PR** — POM, fixtures injection, data migration |
-| 3 | **Not started** | Blocked on Batch 2 — flat specs + `@smoke` / `@regression` tags |
+| 2 | **Complete** | POM, fixtures injection, `navigation.map.ts`, ADRs — 12/12 Docker CI pass |
+| 3 | **Partial (~20%)** | **Next PR** — `@smoke` / `@regression` tags, rename `smoke-internet.spec.ts` |
 | 4 | **Partial (~30%)** | `playwright.yml` uses Playwright Docker image (fixes Noble install error); full dual-gate pipeline pending |
 | 5–7 | **Not started** | — |
 
@@ -75,8 +75,8 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 | Batch | Name | Goal | Est. effort | Progress |
 | --- | --- | --- | --- | --- |
 | 1 | Infrastructure, hooks & AI standards | TS tooling, Husky, `.cursor/rules/` from day one | 1 PR | **Complete** |
-| 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR | **Next** |
-| 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | Not started |
+| 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR | **Complete** |
+| 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | **Next** |
 | 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | ~30% |
 | 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | Not started |
 | 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | Not started |
@@ -137,18 +137,18 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 **Objective:** Build the reusable framework layer — page objects, fixtures, and the centralized tag system.
 
-**Batch status:** **Not started — NEXT PR.** Scaffolding exists (`src/pages/the-internet/.gitkeep`, stub `src/fixtures/index.ts`) but no real POM or fixture injection yet. Legacy code still at `pages/` and `utils/`.
+**Batch status:** **Complete.** Exit criteria verified — `npm run lint && npm run typecheck && npm run docker:test:ci` (12/12 pass).
 
 ### Batch 2 — Checklist
 
 #### Page objects & fixtures
 
-- [ ] Create `src/pages/base.page.ts` (navigation, `goto`, `waitForLoaded`)
-- [ ] Extend `src/fixtures/index.ts` — custom `test` export with page injection (currently stub re-export only)
-- [ ] Create `src/fixtures/pages.fixture.ts` — inject page objects into test context
-- [ ] Migrate `pages/add-remove-elements.page.ts` → `src/pages/the-internet/add-remove-elements.page.ts`
-- [ ] Create `src/pages/the-internet/landing.page.ts`
-- [ ] Migrate `utils/test-data.ts` → `src/data/navigation.map.ts`
+- [x] Create `src/pages/base.page.ts` (navigation, `goto` — no manual sync per ADR-0001)
+- [x] Extend `src/fixtures/index.ts` — custom `test` export with page injection
+- [x] Create `src/fixtures/pages.fixture.ts` — inject page objects into test context
+- [x] Migrate `pages/add-remove-elements.page.ts` → `src/pages/the-internet/add-remove-elements.page.ts`
+- [x] Create `src/pages/the-internet/landing.page.ts`
+- [x] Migrate `utils/test-data.ts` → `src/data/navigation.map.ts`
 
 #### Centralized tag system
 
@@ -163,14 +163,14 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
   } as const;
   ```
 
-- [ ] Export grep helpers or document tag usage pattern for specs and CI scripts
+- [x] Export grep helpers or document tag usage pattern for specs and CI scripts (`grepPatterns` + JSDoc in `test-tags.ts`)
 - [x] Wire `package.json` scripts to use tag constants (or consistent grep strings)
 
 #### Standards documentation
 
 - [x] Add `docs/SELECTOR_POLICY.md` (locator hierarchy — `getByRole` first) — completed in Batch 1
-- [ ] Add first ADR: `docs/adr/0001-page-object-boundaries.md`
-- [ ] Add ADR: `docs/adr/0002-tag-based-execution-over-folder-tiers.md`
+- [x] Add first ADR: `docs/adr/0001-page-object-boundaries.md`
+- [x] Add ADR: `docs/adr/0002-tag-based-execution-over-folder-tiers.md`
 
 ### Batch 2 — Exit criteria
 
@@ -187,7 +187,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 > **No tier folders.** Tests stay in `tests/` root as `{feature}.spec.ts`.
 
-**Batch status:** **Not started — blocked on Batch 2.** Current state: `tests/smoke-internet.spec.ts` still exists; no `@smoke` / `@regression` tags; `tests/landing.spec.ts` imports `utils/test-data`; root `pages/` and `utils/` folders remain.
+**Batch status:** **Partial (~20%) — NEXT PR.** Specs use `@fixtures` and injected page objects; legacy `pages/` and `utils/` removed. Remaining: `@smoke` / `@regression` tags, rename `smoke-internet.spec.ts` → `add-remove-elements.spec.ts`.
 
 ### Batch 3 — Checklist
 
@@ -205,10 +205,10 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 #### Refactor to framework patterns
 
-- [x] Replace direct `@playwright/test` imports with `@fixtures` in `tests/landing.spec.ts` (partial — `smoke-internet.spec.ts` still uses `@playwright/test`)
-- [ ] Use injected page objects (`landingPage`, `addRemoveElementsPage`)
-- [ ] Remove `console.log` and legacy `utils/` imports
-- [ ] Delete empty root `pages/` and `utils/` folders
+- [x] Replace direct `@playwright/test` imports with `@fixtures` (both specs)
+- [x] Use injected page objects (`landingPage`, `addRemoveElementsPage`)
+- [x] Remove legacy `utils/` imports (`@data/navigation.map`)
+- [x] Delete empty root `pages/` and `utils/` folders
 
 #### Documentation cleanup
 
@@ -428,11 +428,11 @@ Batch 6 (Visibility)   Batch 7 (Culture + nightly @regression)
 
 ## Approval gate
 
-Architecture approved. **Batch 1 complete.**
+Architecture approved. **Batches 1–2 complete.**
 
-**Active gate — before starting Batch 2:**
+**Active gate — before starting Batch 3:**
 
-1. Do not start Batch 3 until Batch 2 is merged and green in CI.
+1. Batch 2 merged and green in CI.
 2. Reserve full Batch 4 dual-gate work for after Batch 3 (tags must exist before `--grep` CI has value).
 
-**Next implementation target:** **Batch 2 — Framework Core** (single PR).
+**Next implementation target:** **Batch 3 — Migrate Existing Tests** (tags + rename `add-remove-elements.spec.ts`).

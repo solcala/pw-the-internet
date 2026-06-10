@@ -4,65 +4,15 @@ globs: src/**/*,tests/**/*.ts
 alwaysApply: false
 ---
 
-# Architecture & File Conventions
+# Architecture
 
-Canonical layout: [`docs/BLUEPRINT.md`](../../docs/BLUEPRINT.md)
+**Canonical source:** [`docs/BLUEPRINT.md`](../../docs/BLUEPRINT.md)
 
-## Flat `tests/` — no tier folders
+When editing `src/` or `tests/`:
 
-```text
-tests/
-├── landing.spec.ts
-├── add-remove-elements.spec.ts
-└── dynamic-controls.spec.ts
-```
+- Flat `tests/{feature}.spec.ts` — tags in titles, not tier folders (see ADR-0002)
+- Kebab-case filenames · PascalCase class names
+- Specs import `@fixtures` — never `@playwright/test` directly
+- Path aliases: `@fixtures`, `@pages/*`, `@data/*`, `@config/*`
 
-**Forbidden:**
-
-- Subfolders: `tests/smoke/`, `tests/regression/`, `tests/e2e/`
-- Tier suffixes: `*.smoke.spec.ts`, `*.regression.spec.ts`
-- Execution intent in paths — use tags in titles: `@smoke`, `@regression`
-
-Filter suites at runtime: `npm run test:smoke` → `--grep @smoke`
-
-## Kebab-case filenames only
-
-All files under `src/` and `tests/` **must** use kebab-case:
-
-| ✅ Allowed | ❌ Forbidden |
-| --- | --- |
-| `add-remove-elements.page.ts` | `AddRemoveElements.page.ts` |
-| `dynamic-controls.spec.ts` | `dynamicControls.spec.ts` |
-| `navigation.map.ts` | `navigationMap.ts` |
-
-> TypeScript **class names** inside files remain PascalCase (`AddRemoveElementsPage`).
-
-## Layer boundaries
-
-| Layer | Owns | Must NOT own |
-| --- | --- | --- |
-| `src/pages/` | `readonly` locators, user actions | `expect()` assertions |
-| `tests/` | assertions, `@smoke`/`@regression` tags, `test.describe` groups | raw locators, direct `@playwright/test` import |
-| `src/fixtures/` | custom `test` export, page injection | business logic |
-| `src/data/` | maps, builders, env credentials | DOM interaction |
-| `src/config/` | `environments.ts`, `test-tags.ts` | locators |
-
-## Required imports
-
-```typescript
-// ✅ Specs
-import { test, expect } from '@fixtures';
-
-// ❌ Specs
-import { test, expect } from '@playwright/test';
-```
-
-## Path aliases (mandatory)
-
-`@fixtures` · `@pages/*` · `@data/*` · `@config/*` · `@utils/*`
-
-No deep relative imports (`../../../src/pages/...`) in new code.
-
-## One file per feature
-
-Happy paths and negative/edge cases live in the **same** spec file, grouped by `test.describe` — never split across tier files.
+Layer boundaries and full layout: [`docs/BLUEPRINT.md`](../../docs/BLUEPRINT.md).

@@ -13,15 +13,18 @@ Playwright test automation suite for [The Internet](https://the-internet.herokua
 
 ## Documentation
 
+Start at **[docs/README.md](docs/README.md)** — documentation index with canonical sources per topic.
+
 | Document | Description |
 | --- | --- |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Methodology, quality gates & scaling playbook |
-| [AGENTS.md](AGENTS.md) | AI agent boundaries — audit only, never auto-commit |
-| [docs/BLUEPRINT.md](docs/BLUEPRINT.md) | Approved architecture — flat `tests/`, layered `src/` |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Batch-by-batch implementation plan |
-| [docs/SELECTOR_POLICY.md](docs/SELECTOR_POLICY.md) | Locator hierarchy — Gate 1.1 audit standard |
+| [docs/README.md](docs/README.md) | **Index** — which file owns which rules |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Workflow, quality gates, PR process |
+| [docs/SELECTOR_POLICY.md](docs/SELECTOR_POLICY.md) | **Canonical** locators, POM, sync policy |
+| [docs/BLUEPRINT.md](docs/BLUEPRINT.md) | **Canonical** folder structure and layers |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Batch progress and checklist |
+| [AGENTS.md](AGENTS.md) | AI entry point — links to canonical docs |
 
-> **Current status:** Batch 1 complete (infrastructure, hooks, AI standards). Batch 2 (framework core) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Current status:** Batch 2 complete (framework core — POM, fixtures, data layer). Batch 3 (test migration + tags) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Project structure
 
@@ -43,8 +46,6 @@ docker/                         # Playwright Docker parity (Gate 1.3 + CI)
 ```
 
 Execution tiers are **tags in test titles**, not subfolders — suites are filtered via `--grep @smoke` / `--grep @regression`. There are no `tests/smoke/` or `tests/regression/` directories.
-
-Legacy paths (`pages/`, `utils/`) remain until Batch 2–3 migration.
 
 ## Getting started
 

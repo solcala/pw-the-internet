@@ -2,24 +2,20 @@
 description: Global instructions for Cursor Agent acting as a Senior QA Automation Engineer
 globs: **/*
 ---
-# Role: Senior QA Automation Engineer
+# Senior QA Automation Engineer
 
-You are an expert in Playwright automation. You operate with a focus on clean, maintainable, and high-performance code.
+Read [`AGENTS.md`](../../AGENTS.md) and [`docs/README.md`](../../docs/README.md) before generating code.
 
-## Core Directives
+## Agent-only (not duplicated in coding standards)
 
-1. **Language:** All generated code, documentation, comments, and commit messages MUST be in English.
-2. **Technical Focus:** Focus entirely on technical implementation, test stability, and automation efficiency. Do not suggest management or administrative tasks.
-3. **Architecture:** Use the Page Object Model (POM) strictly.
-   - Every UI interaction must be encapsulated in a class within `src/pages/`.
-   - Never use locators directly in `*.spec.ts` files.
-4. **Quality Gates:** - Never include `page.pause()`, manual `waitForTimeout()`, or hardcoded sleeps. Use `expect` with auto-retrying assertions.
-   - Every file must pass `npm run lint` and `npm run typecheck`.
-5. **Code Safety:** - No "TODO: AI Generated" comments. Write production-ready code.
-   - Prioritize `data-testid` for locators.
+- English only · production-ready code · no auto-commit/push
+- One batch per PR per [`docs/ROADMAP.md`](../../docs/ROADMAP.md)
+- Analyze existing `src/` before adding tests
 
-## Workflow
+## Canonical rules (do not duplicate here)
 
-- When asked for tests, first analyze the existing `src/` directory.
-- Use Playwright best practices (e.g., `test.step`, unique IDs).
-- Create atomic, independent, and parallelizable tests.
+| Topic | Source |
+| --- | --- |
+| Locators, POM, sync | [`docs/SELECTOR_POLICY.md`](../../docs/SELECTOR_POLICY.md) |
+| Structure, layers | [`docs/BLUEPRINT.md`](../../docs/BLUEPRINT.md) |
+| Gates, workflow | [`CONTRIBUTING.md`](../../CONTRIBUTING.md) §8–9 |

@@ -1,19 +1,18 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
+import { BasePage } from '@pages/base.page';
 
-export class AddRemoveElementsPage {
-  readonly page: Page;
+export class AddRemoveElementsPage extends BasePage {
   readonly addElementButton: Locator;
   readonly deleteButtons: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.addElementButton = page.getByRole('button', { name: 'Add Element' });
     this.deleteButtons = page.getByRole('button', { name: 'Delete' });
   }
 
-  async goto(): Promise<void> {
-    await this.page.goto('/add_remove_elements/');
-    await expect(this.addElementButton).toBeVisible();
+  async open(): Promise<void> {
+    await this.goto('/add_remove_elements/');
   }
 
   async addElements(times: number): Promise<void> {

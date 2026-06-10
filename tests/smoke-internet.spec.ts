@@ -1,11 +1,8 @@
-import { expect, test } from '@playwright/test';
-import { AddRemoveElementsPage } from '../pages/add-remove-elements.page';
+import { test, expect } from '@fixtures';
 
 test.describe('Smoke - The Internet', () => {
-  test('adds and removes dynamic elements', async ({ page }) => {
-    const addRemoveElementsPage = new AddRemoveElementsPage(page);
-
-    await addRemoveElementsPage.goto();
+  test('adds and removes dynamic elements', async ({ addRemoveElementsPage }) => {
+    await addRemoveElementsPage.open();
     await addRemoveElementsPage.addElements(3);
     await expect(addRemoveElementsPage.deleteButtons).toHaveCount(3);
 

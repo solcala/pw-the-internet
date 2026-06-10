@@ -4,51 +4,15 @@ globs: src/pages/**/*.ts,tests/**/*.ts
 alwaysApply: false
 ---
 
-# Selector Policy
+# Selector & POM Policy
 
-Authoritative detail: [`docs/SELECTOR_POLICY.md`](../../docs/SELECTOR_POLICY.md). Audited at **Gate 1.1** before every commit.
+**Canonical source:** [`docs/SELECTOR_POLICY.md`](../../docs/SELECTOR_POLICY.md)
 
-## Locator priority (strict order)
+When editing page objects or specs, follow the full policy including:
 
-Use the **first applicable** strategy. Never skip a higher tier without a `SELECTOR EXCEPTION:` comment.
+- Locator hierarchy (`getByRole` first)
+- No locators in specs — use `@fixtures` page objects
+- No assertions or manual sync in `src/pages/`
+- Gate 1.1 audit checklist before commit
 
-1. `getByRole(role, { name })` — **absolute priority** for buttons, links, headings, inputs, checkboxes
-2. `getByLabel()`
-3. `getByPlaceholder()`
-4. `getByTestId()` — camelCase `d` only; team-owned `data-testid`
-5. `getByText()` — **non-interactive copy only** (alerts, status messages). **Forbidden** on buttons, links, inputs, or any element with a native WAI-ARIA role
-6. CSS / XPath — **forbidden** unless isolated DOM limitation (mandatory inline exception comment)
-
-## Banned in specs
-
-- Specs (`tests/`) **must not** define locators — use page objects via `@fixtures`
-- No `page.locator('.class')`, XPath, or `getByText('Delete')` on interactive controls
-
-## Type-safe dynamic locators
-
-Dynamic locators **must** use explicit `Locator` return types — never untyped arrow properties.
-
-```typescript
-import type { Locator } from '@playwright/test';
-
-// ✅ Private scoped method
-private tableRow(rowText: string): Locator {
-  return this.page.locator('tr').filter({ hasText: rowText });
-}
-
-// ✅ Typed factory
-readonly rowDeleteButton = (rowText: string): Locator =>
-  this.tableRow(rowText).getByRole('button', { name: 'Delete' });
-```
-
-- Scope rows/lists with `.filter({ hasText })`, then target children with `getByRole`
-- Prefer `private` methods for dynamic parents; expose typed `Locator` factories for callers
-- No `page.waitForTimeout()` as a locator workaround
-
-## Gate 1.1 self-check before commit
-
-- [ ] Every locator follows hierarchy
-- [ ] No CSS/XPath without `SELECTOR EXCEPTION:` comment
-- [ ] No locators in spec files
-- [ ] No `getByText()` on interactive elements
-- [ ] Dynamic methods return `Locator` explicitly
+Do not duplicate rules here — read [`docs/SELECTOR_POLICY.md`](../../docs/SELECTOR_POLICY.md).
