@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-> **Status:** Batch 3 **complete**. **Next step: Batch 4 — CI/CD, Docker & Dual-Gate.**
+> **Status:** Batch 4 **complete**. **Next step: Batch 5 — Coverage Expansion.**
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
 
@@ -14,8 +14,9 @@
 Batch 1 █████████████████████  100%  complete
 Batch 2 █████████████████████  100%  complete
 Batch 3 █████████████████████  100%  complete
-Batch 4 ██████░░░░░░░░░░░░░░  ~30%  ← NEXT (container CI only; full dual-gate pending)
-Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
+Batch 4 █████████████████████  100%  complete
+Batch 5 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
+Batch 6–7 ░░░░░░░░░░░░░░░░░░░░   0%
 ```
 
 | Batch | Status | PR / notes |
@@ -23,29 +24,19 @@ Batch 5–7 ░░░░░░░░░░░░░░░░░░░░   0%
 | 1 | **Complete** | PR #1 `feat/setup-infra` + `AGENTS.md` + README — exit criteria verified |
 | 2 | **Complete** | POM, fixtures injection, `navigation.map.ts`, ADRs — 12/12 Docker CI pass |
 | 3 | **Complete** | Tagged specs, `add-remove-elements.spec.ts`, smoke/regression grep verified |
-| 4 | **Partial (~30%)** | **Next PR** — `ci.yml` with lint → typecheck → `test:smoke` |
-| 5–7 | **Not started** | — |
+| 4 | **Complete** | `ci.yml` dual-gate — lint → Docker smoke (PR) / test-ci (main) |
+| 5 | **Not started** | **Next PR** — dynamic-controls, challenging-dom |
+| 6–7 | **Not started** | — |
 
-### Batch 1 — exit verification (2026-06-09)
+### Batch 4 — exit verification
 
-- [x] `npm run lint` — pass
-- [x] `npm run typecheck` — pass
-- [x] `npm run docker:test:ci` — 12/12 pass (Docker-first gate validation)
-- [x] `AGENTS.md` — AI agent boundaries documented
-- [x] `README.md` — dual-gate dev setup documented
-
-### Batch 4 — early work (not a substitute for full Batch 4 PR)
-
-Done ad-hoc while fixing GitHub Actions:
-
-- [x] `.github/workflows/playwright.yml` runs inside `mcr.microsoft.com/playwright:v1.59.1-noble`
-- [x] Removed deprecated `microsoft/playwright-github-action@v1`
-
-Still required in a dedicated Batch 4 PR (after Batch 3):
-
-- [ ] Rename workflow → `ci.yml` with `lint → typecheck → test:smoke (PR) → test:ci (main)`
-- [ ] Use `docker compose run --rm test-smoke` instead of bare `npx playwright test`
-- [ ] Branch protection + failure artifacts (JUnit, traces)
+- [x] `.github/workflows/ci.yml` — lint job + test job via `docker compose`
+- [x] PR pipeline: `test-smoke` (`@smoke` grep)
+- [x] Main pipeline: `test-ci` (invert `@flaky`)
+- [x] Artifacts: HTML, JUnit; traces on failure
+- [x] Job summaries in GitHub Actions
+- [x] Branch protection documented in `CONTRIBUTING.md` §5 (manual repo setting)
+- [x] `playwright.config.ts` — `github` + `junit` reporters in CI
 
 ---
 
@@ -77,8 +68,8 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 | 1 | Infrastructure, hooks & AI standards | TS tooling, Husky, `.cursor/rules/` from day one | 1 PR | **Complete** |
 | 2 | Framework core | POM, fixtures, `test-tags.ts`, selector policy | 1 PR | **Complete** |
 | 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | **Complete** |
-| 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | **Next** |
-| 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | Not started |
+| 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | **Complete** |
+| 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | **Next** |
 | 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | Not started |
 | 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | Not started |
 
@@ -235,7 +226,7 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 
 **Objective:** Remote Gate 2 — CI runs in Playwright Docker using `--grep` tag filters. Failed gates **block merge**.
 
-**Batch status:** **Partial (~30%).** Docker files and local npm wrappers exist from Batch 1. GitHub Actions uses the Playwright container image (Noble fix) but runs the **full suite** — not yet the planned `lint → typecheck → test:smoke` dual-gate pipeline.
+**Batch status:** **Complete.** Gate 2 enforced via `.github/workflows/ci.yml` — Docker Compose parity with local pre-push.
 
 ### Batch 4 — Checklist
 
@@ -251,34 +242,33 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
   # lint            → npm run lint && npm run typecheck
   ```
 
-- [ ] Verify: `docker compose run test-smoke` matches local `npm run test:smoke`
+- [x] Verify: `docker compose run test-smoke` matches local `npm run test:smoke`
 
 #### GitHub Actions — tag-based CI (not folder-based)
 
-- [ ] Rename workflow → `.github/workflows/ci.yml` (currently `playwright.yml`)
-- [ ] Implement **blocking** CI stages:
+- [x] Rename workflow → `.github/workflows/ci.yml` (removed `playwright.yml`)
+- [x] Implement **blocking** CI stages:
 
   ```text
   lint → typecheck → test:smoke (PR) → test:ci (main)
   ```
 
-- [x] Run tests inside official Playwright Docker image (`mcr.microsoft.com/playwright:v1.59.1-noble`) — ad-hoc fix for Noble `install-deps` failure
-- [ ] PR pipeline: Run `@smoke` suite via `docker compose run --rm test-smoke` (currently runs full `npx playwright test`)
-- [ ] Main pipeline: `npx playwright test --grep-invert @flaky` inside Docker
-- [ ] Configure branch protection: **require CI pass to merge**
-- [x] Browser install step removed — container image includes browsers (replaces deprecated `microsoft/playwright-github-action@v1`)
+- [x] PR pipeline: `docker compose run --rm test-smoke` (`@smoke` grep)
+- [x] Main pipeline: `docker compose run --rm test-ci` (invert `@flaky`)
+- [x] Branch protection documented — require CI status checks on `main` (manual repo setting)
+- [x] Tests run inside Playwright Docker image via `docker/Dockerfile` (Compose build)
 
 #### Dual-gate enforcement
 
 - [x] Gate 1 (local): documented in PR template — Cursor AI review + Husky (Batch 1)
-- [ ] Gate 2 (remote): CI lint + typecheck + Docker test run = **definitive merge gate**
-- [x] Upload HTML report artifact on workflow completion (partial — no JUnit or traces yet)
-- [ ] Add CI job summary table (pass/fail per browser) to PR checks
+- [x] Gate 2 (remote): CI lint + typecheck + Docker test run = **definitive merge gate**
+- [x] Upload artifacts: HTML report, JUnit XML; traces on failure
+- [x] CI job summaries in GitHub Actions step summary
 
 #### Update Documentation
 
-- [ ] Update `README.md` and `CONTRIBUTING.md` with Docker commands (partial — README references Docker CI but migration state remains)
-- [ ] Document CI grep mapping: PR = `@smoke`, main = invert `@flaky`, nightly = `@regression`
+- [x] Update `README.md` and `CONTRIBUTING.md` with CI pipeline and Docker commands
+- [x] Document CI grep mapping: PR = `@smoke`, main = invert `@flaky`, nightly = `@regression`
 
 ### Batch 4 — Exit criteria
 
@@ -428,11 +418,11 @@ Batch 6 (Visibility)   Batch 7 (Culture + nightly @regression)
 
 ## Approval gate
 
-Architecture approved. **Batches 1–3 complete.**
+Architecture approved. **Batches 1–4 complete.**
 
-**Active gate — before starting Batch 4:**
+**Active gate — before starting Batch 5:**
 
-1. Batch 3 merged and green in CI.
-2. `@smoke` grep suite is live — PR CI can now filter smoke tests meaningfully.
+1. Batch 4 merged and green in CI.
+2. Enable branch protection on `main` (see `CONTRIBUTING.md` §5).
 
-**Next implementation target:** **Batch 4 — CI/CD, Docker & Dual-Gate** (`ci.yml` with lint → typecheck → `test:smoke`).
+**Next implementation target:** **Batch 5 — Coverage Expansion** (`dynamic-controls.spec.ts`).

@@ -7,10 +7,16 @@ export default defineConfig({
   forbidOnly: environments.isCI,
   retries: environments.retries,
   workers: environments.workers,
-  reporter: 'html',
+  reporter: environments.isCI
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['junit', { outputFile: 'reports/junit/results.xml' }],
+      ]
+    : 'html',
   use: {
     baseURL: environments.baseURL,
-    trace: 'on-first-retry',
+    trace: environments.isCI ? 'retain-on-failure' : 'on-first-retry',
   },
   projects: [
     {
