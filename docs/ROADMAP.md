@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-> **Status:** Batch 5 **complete**. **Next step: Batch 6 — Visibility & PM Metrics.**
+> **Status:** Batch 6 **complete**. **Next step: Batch 7 — Engineering Culture.**
 >
 > Each batch is a self-contained PR. Do not start the next batch until the current one is merged and green in CI.
 
@@ -8,7 +8,7 @@
 
 ## Implementation progress
 
-**Last updated:** 2026-06-10 · **Branch:** `feat/coverage-expansion`
+**Last updated:** 2026-06-10 · **Branch:** `feat/visibility-metrics`
 
 ```text
 Batch 1 █████████████████████  100%  complete
@@ -16,8 +16,8 @@ Batch 2 █████████████████████  100%  c
 Batch 3 █████████████████████  100%  complete
 Batch 4 █████████████████████  100%  complete
 Batch 5 █████████████████████  100%  complete
-Batch 6 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
-Batch 7 ░░░░░░░░░░░░░░░░░░░░   0%
+Batch 6 █████████████████████  100%  complete
+Batch 7 ░░░░░░░░░░░░░░░░░░░░   0%   ← NEXT
 ```
 
 | Batch | Status | PR / notes |
@@ -27,7 +27,8 @@ Batch 7 ░░░░░░░░░░░░░░░░░░░░   0%
 | 3 | **Complete** | Tagged specs, `add-remove-elements.spec.ts`, smoke/regression grep verified |
 | 4 | **Complete** | `ci.yml` dual-gate — lint → Docker smoke (PR) / test-ci (main) |
 | 5 | **Complete** | dynamic-controls, challenging-dom, navigation scale — 60/60 Docker CI pass |
-| 6–7 | **Not started** | — |
+| 6 | **Complete** | metrics reporter, GitHub Pages, TEST_STRATEGY.md — CI summaries by tag/browser |
+| 7 | **Not started** | — |
 
 ### Batch 4 — exit verification
 
@@ -71,8 +72,8 @@ Batch 1 ──► Batch 2 ──► Batch 3 ──► Batch 4 ──► Batch 5 
 | 3 | Migrate existing tests | Flat feature specs with `@smoke` / `@regression` tags | 1 PR | **Complete** |
 | 4 | CI/CD, Docker & dual-gate | `--grep` suites in CI, blocking merge gates | 1 PR | **Complete** |
 | 5 | Coverage expansion | New features in single files with `test.describe` groups | 2–3 PRs | **Complete** |
-| 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | **Next** |
-| 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | Not started |
+| 6 | Visibility & metrics | GitHub Pages reports, PM-friendly dashboards | 1 PR | **Complete** |
+| 7 | Engineering culture | ADRs, CODEOWNERS, onboarding, nightly `@regression` | 1 PR | **Next** |
 
 ---
 

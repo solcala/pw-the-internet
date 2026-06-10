@@ -10,7 +10,9 @@ Single entry point for project documentation. **Each topic has one canonical fil
 | **Structure** | [`BLUEPRINT.md`](BLUEPRINT.md) | Folder layout, layer boundaries, path aliases, naming |
 | **Process** | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) | Workflow, quality gates (§9), PR process, onboarding |
 | **Progress** | [`ROADMAP.md`](ROADMAP.md) | Batch checklist and implementation status only |
+| **Test strategy** | [`TEST_STRATEGY.md`](TEST_STRATEGY.md) | Tag tiers, release decisions, suite shape |
 | **CI pipeline** | [`../.github/workflows/ci.yml`](../.github/workflows/ci.yml) | Gate 2 — lint → Docker tests (`@smoke` on PR) |
+| **Pages deploy** | [`../.github/workflows/pages.yml`](../.github/workflows/pages.yml) | Publish HTML report to GitHub Pages after green `main` CI |
 
 ## Decision log (why, not how)
 

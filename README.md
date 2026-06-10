@@ -1,5 +1,8 @@
 # pw-the-internet
 
+[![CI](https://github.com/solcala/pw-the-internet/actions/workflows/ci.yml/badge.svg)](https://github.com/solcala/pw-the-internet/actions/workflows/ci.yml)
+[![Report](https://img.shields.io/badge/report-GitHub%20Pages-blue)](https://solcala.github.io/pw-the-internet/)
+
 Playwright test automation suite for [The Internet](https://the-internet.herokuapp.com/) — a demo site commonly used for QA practice and portfolio projects.
 
 ## Stack
@@ -22,9 +25,10 @@ Start at **[docs/README.md](docs/README.md)** — documentation index with canon
 | [docs/SELECTOR_POLICY.md](docs/SELECTOR_POLICY.md) | **Canonical** locators, POM, sync policy |
 | [docs/BLUEPRINT.md](docs/BLUEPRINT.md) | **Canonical** folder structure and layers |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Batch progress and checklist |
+| [docs/TEST_STRATEGY.md](docs/TEST_STRATEGY.md) | `@smoke` vs `@regression` for release decisions |
 | [AGENTS.md](AGENTS.md) | AI entry point — links to canonical docs |
 
-> **Current status:** Batch 5 complete (coverage expansion). Batch 6 (visibility & metrics) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Current status:** Batch 6 complete (visibility & metrics). Batch 7 (engineering culture) is next — see [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Project structure
 
@@ -41,7 +45,8 @@ src/                            # Layered framework code
 ├── config/                     # environments.ts, test-tags.ts
 ├── fixtures/                   # custom test export + page injection
 ├── pages/the-internet/         # feature page objects
-└── data/                       # navigation maps, builders, credentials
+├── data/                       # navigation maps, builders, credentials
+└── utils/reporters/            # metrics-reporter.ts (PM JSON)
 
 docker/                         # Playwright Docker parity (Gate 1.3 + CI)
 ```
@@ -125,6 +130,8 @@ Workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — Gate 2 remo
 | **Pull request** | lint → typecheck → tests | `@smoke` | `test-smoke` |
 | **Push to `main`** | lint → typecheck → tests | invert `@flaky` | `test-ci` |
 
-Artifacts on every run: HTML report, JUnit XML. Traces uploaded on failure.
+Artifacts on every run: HTML report, JUnit XML, metrics JSON (`reports/metrics/summary.json`). Traces uploaded on failure.
+
+**GitHub Pages:** [Live HTML report](https://solcala.github.io/pw-the-internet/) — published by [`.github/workflows/pages.yml`](.github/workflows/pages.yml) after each green `main` build. Enable **Settings → Pages → Source: GitHub Actions** once per repo.
 
 **Branch protection:** Import [`.github/rulesets/protect-main.json`](.github/rulesets/protect-main.json) — see [`.github/rulesets/README.md`](.github/rulesets/README.md).

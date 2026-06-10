@@ -12,8 +12,18 @@ export default defineConfig({
         ['github'],
         ['html', { open: 'never' }],
         ['junit', { outputFile: 'reports/junit/results.xml' }],
+        [
+          './src/utils/reporters/metrics-reporter.ts',
+          { outputFile: 'reports/metrics/summary.json' },
+        ],
       ]
-    : 'html',
+    : [
+        ['html', { open: 'never' }],
+        [
+          './src/utils/reporters/metrics-reporter.ts',
+          { outputFile: 'reports/metrics/summary.json' },
+        ],
+      ],
   use: {
     baseURL: environments.baseURL,
     trace: environments.isCI ? 'retain-on-failure' : 'on-first-retry',
